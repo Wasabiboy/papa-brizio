@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Papà Brizio — Ristorante & Espresso Lounge | Mairangi Bay</title>
+<meta name="description" content="Papà Brizio — where flavor, comfort, and style meet in the heart of Mairangi Bay. Italian cuisine, artisan coffee, curated wines & signature cocktails.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0908;
+    --bg-warm: #14110f;
+    --cream: #f5f0e8;
+    --cream-dim: #c9c1b3;
+    --gold: #c9a96e;
+    --gold-bright: #e0c489;
+    --terra: #8b4513;
+    --wine: #722f37;
+    --green: #4a5c3a;
+    --border: rgba(201, 169, 110, 0.15);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: var(--sans);
+    font-weight: 300;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ===== LOADING SCREEN ===== */
+  .loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 1s ease, visibility 1s ease;
+  }
+  .loader.done { opacity: 0; visibility: hidden; }
+  .loader-ring {
+    width: 220px; height: 220px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .loader-ring::before {
+    content: ''; position: absolute; inset: -1px;
+    border: 2px solid transparent;
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite;
+  }
+  .loader-logo {
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    object-fit: contain;
+    animation: logoFade 1s ease 0.3s both;
+  }
+  @keyframes logoFade { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== NAVIGATION ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1.5rem 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.4s ease;
+  }
+  nav.scrolled {
+    background: rgba(10, 9, 8, 0.92);
+    backdrop-filter: blur(20px);
+    padding: 1rem 3rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 0.75rem;
+    text-decoration: none;
+  }
+  .nav-logo img {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    object-fit: contain;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+  .nav-logo:hover img { transform: rotate(5deg) scale(1.05); }
+  .nav-logo-text {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--cream);
+    line-height: 1;
+  }
+  .nav-logo-text span { color: var(--gold); display: block; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream-dim); margin-top: 0.15rem; }
+  .nav-links {
+    display: flex; gap: 2.5rem; list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.95rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px; background: var(--gold);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    padding: 0.6rem 1.5rem;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+  .nav-cta:hover {
+    background: var(--gold);
+    color: var(--bg);
+  }
+  .nav-mobile { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+  .nav-mobile span { width: 24px; height: 1px; background: var(--cream); transition: 0.3s; }
+
+  /* ===== HERO ===== */
+  .hero {
+    height: 100vh; min-height: 700px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: url('https://static.wixstatic.com/media/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg/v1/fill/w_1920,h_1280,fp_0.5_0.4,q_90,enc_avif,quality_auto/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg') center/cover;
+    transform: scale(1.1);
+    animation: heroZoom 20s ease-out forwards;
+  }
+  @keyframes heroZoom { to { transform: scale(1); } }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(10,9,8,0.5) 0%, rgba(10,9,8,0.3) 40%, rgba(10,9,8,0.85) 100%);
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    text-align: center;
+    padding: 0 2rem;
+    animation: heroFade 2s ease 0.5s both;
+  }
+  @keyframes heroFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-tag {
+    font-size: 0.72rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 9vw, 7rem);
+    font-weight: 400;
+    line-height: 0.95;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+  }
+  .hero h1 .accent { color: var(--gold); font-style: italic; }
+  .hero-sub {
+    font-family: var(--serif);
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--cream-dim);
+    margin-bottom: 2.5rem;
+  }
+  .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    padding: 1rem 2.5rem;
+    background: var(--gold);
+    color: var(--bg);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  .btn-primary:hover { background: var(--gold-bright); transform: translateY(-2px); }
+  .btn-outline {
+    padding: 1rem 2.5rem;
+    border: 1px solid var(--border);
+    color: var(--cream);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .hero-scroll {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    color: var(--cream-dim); font-size: 0.65rem;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    animation: bob 2s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+  .hero-scroll::after { content: ''; width: 1px; height: 40px; background: var(--gold); }
+
+  /* ===== SECTIONS ===== */
+  section { padding: 8rem 3rem; position: relative; }
+  .container { max-width: 1300px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+  .section-title .italic { font-style: italic; color: var(--gold); }
+
+  /* ===== STORY ===== */
+  .story { background: var(--bg-warm); }
+  .story-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+  }
+  .story-img {
+    position: relative; overflow: hidden; aspect-ratio: 4/5;
+  }
+  .story-img img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 1.2s ease;
+  }
+  .story-img:hover img { transform: scale(1.05); }
+  .story-img::after {
+    content: ''; position: absolute; inset: 0;
+    border: 1px solid var(--border);
+    transform: translate(15px, 15px);
+    pointer-events: none;
+  }
+  .story-text p {
+    font-size: 1.05rem;
+    color: var(--cream-dim);
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+  }
+  .story-signature {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-style: italic;
+    color: var(--gold);
+    margin-top: 2rem;
+  }
+
+  /* ===== EXPERIENCE ===== */
+  .experience { background: var(--bg); }
+  .exp-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 4rem;
+  }
+  .exp-card {
+    position: relative; overflow: hidden; aspect-ratio: 3/4;
+    cursor: pointer;
+  }
+  .exp-card img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 1s ease;
+  }
+  .exp-card:hover img { transform: scale(1.08); }
+  .exp-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,9,8,0.92) 0%, rgba(10,9,8,0.15) 55%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 3rem 2.5rem;
+  }
+  .exp-time {
+    font-size: 1.1rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: #fff; margin-bottom: 0.6rem; font-weight: 500;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+  .exp-title {
+    font-family: var(--serif); font-size: 2.8rem; font-weight: 500;
+    margin-bottom: 0.8rem;
+    color: #fff;
+    text-shadow: 0 3px 12px rgba(0,0,0,0.8);
+  }
+  .exp-desc {
+    font-size: 1.15rem; color: #fff; line-height: 1.5;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+
+  /* ===== MENU PREVIEW ===== */
+  .menu-preview { background: var(--bg-warm); }
+  .menu-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-top: 4rem;
+  }
+  .menu-col h3 {
+    font-family: var(--serif); font-size: 1.5rem; font-weight: 400;
+    color: var(--gold); margin-bottom: 2rem;
+    padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+  }
+  .menu-item {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 1.2rem 0; border-bottom: 1px solid rgba(201,169,110,0.08);
+  }
+  .menu-item-name { font-family: var(--serif); font-size: 1.44rem; color: #fff; }
+  .menu-item-desc { font-size: 0.96rem; color: #fff; opacity: 0.8; display: block; margin-top: 0.3rem; }
+  .menu-item-price { font-family: var(--serif); font-size: 1.44rem; color: var(--gold); font-weight: 500; }
+
+  /* ===== HIGH TEA ===== */
+  .hightea { background: var(--bg-warm); overflow: hidden; }
+  .hightea-grid {
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 4rem; align-items: center; margin-top: 4rem;
+  }
+  .hightea-images {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;
+  }
+  .hightea-images img {
+    width: 100%; border-radius: 2px; transition: transform 0.6s ease;
+  }
+  .hightea-images img:hover { transform: scale(1.03); }
+  .hightea-images img:first-child { grid-row: span 2; height: 100%; object-fit: cover; }
+  .hightea-images img:nth-child(2) { height: 100%; object-fit: cover; }
+  .hightea-images img:nth-child(3) { grid-column: span 2; height: 100%; object-fit: cover; }
+  .hightea-info p {
+    font-size: 1.1rem; color: #fff; margin-bottom: 1.2rem; line-height: 1.8;
+  }
+  .hightea-pricing {
+    display: flex; gap: 2rem; margin: 2rem 0;
+    flex-wrap: wrap;
+  }
+  .hightea-price-card {
+    border: 1px solid var(--border); padding: 1.5rem 2rem; background: rgba(10,9,8,0.5);
+  }
+  .hightea-price-card .price {
+    font-family: var(--serif); font-size: 2.5rem; color: var(--gold); font-weight: 500;
+  }
+  .hightea-price-card .price .pp { font-size: 0.9rem; color: var(--cream-dim); }
+  .hightea-price-card .desc { font-size: 1rem; color: #fff; margin-top: 0.5rem; }
+  .hightea-details {
+    font-size: 1rem; color: var(--cream-dim); line-height: 1.8; margin: 1.5rem 0;
+  }
+  .hightea-details strong { color: var(--gold); }
+  /* Form */
+  .hightea-form {
+    margin-top: 2rem; display: grid; gap: 1rem;
+  }
+  .hightea-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .hightea-form input, .hightea-form textarea, .hightea-form select {
+    background: rgba(10,9,8,0.6); border: 1px solid var(--border); color: #fff;
+    padding: 0.9rem 1rem; font-family: var(--sans); font-size: 1rem; border-radius: 2px;
+    transition: border-color 0.3s; width: 100%;
+  }
+  .hightea-form input:focus, .hightea-form textarea:focus, .hightea-form select:focus {
+    border-color: var(--gold); outline: none;
+  }
+  .hightea-form textarea { min-height: 100px; resize: vertical; }
+  .hightea-form label { font-size: 0.9rem; color: var(--cream-dim); margin-bottom: 0.3rem; display: block; }
+  .hightea-form .btn-primary { justify-self: start; cursor: pointer; border: none; font-family: var(--sans); }
+  .hightea-form-note { font-size: 0.85rem; color: var(--cream-dim); font-style: italic; }
+  .gallery { background: var(--bg); overflow: hidden; padding: 0; }
+  .gallery-header { text-align: center; padding: 6rem 3rem 3rem; }
+  .carousel {
+    position: relative; width: 100%; height: 70vh; min-height: 480px;
+    overflow: hidden;
+  }
+  .carousel-track {
+    display: flex; height: 100%; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .carousel-slide {
+    min-width: 100%; height: 100%; position: relative;
+  }
+  .carousel-slide img {
+    width: 100%; height: 100%; object-fit: cover;
+    transform: scale(1.05); transition: transform 6s ease;
+  }
+  .carousel-slide.active img { transform: scale(1); }
+  .carousel-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,9,8,0.7) 0%, rgba(10,9,8,0.1) 50%, rgba(10,9,8,0.3) 100%);
+  }
+  .carousel-caption {
+    position: absolute; bottom: 3rem; left: 0; right: 0;
+    text-align: center; z-index: 2;
+    padding: 0 2rem;
+    animation: captionFade 0.8s ease 0.3s both;
+  }
+  @keyframes captionFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .carousel-caption-label {
+    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.5rem;
+  }
+  .carousel-caption-title {
+    font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 400; color: var(--cream);
+  }
+  .carousel-caption-title .italic { font-style: italic; color: var(--gold); }
+  .carousel-arrows {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 100%; display: flex; justify-content: space-between;
+    padding: 0 2rem; z-index: 3; pointer-events: none;
+  }
+  .carousel-arrow {
+    width: 52px; height: 52px; border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%; background: rgba(10,9,8,0.5); backdrop-filter: blur(8px);
+    color: var(--cream); font-size: 1.2rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s; pointer-events: auto;
+    flex-shrink: 0;
+  }
+  .carousel-arrow:hover { background: var(--gold); border-color: var(--gold); color: var(--bg); }
+  .carousel-dots {
+    position: absolute; bottom: 1.2rem; left: 0; right: 0;
+    display: flex; justify-content: center; gap: 0.6rem; z-index: 3;
+  }
+  .carousel-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.2); cursor: pointer;
+    transition: all 0.3s;
+  }
+  .carousel-dot.active { background: var(--gold); width: 28px; border-radius: 4px; }
+  .carousel-progress {
+    position: absolute; bottom: 0; left: 0; height: 2px;
+    background: var(--gold); z-index: 3; transition: width 0.1s linear;
+  }
+
+  /* ===== VISIT ===== */
+  .visit {
+    background: var(--bg-warm);
+    position: relative;
+    overflow: hidden;
+  }
+  .visit-bg {
+    position: absolute; inset: 0; opacity: 0.15;
+    background: url('https://static.wixstatic.com/media/05f177_746831b1aa9d4c8fa5d6e2f0b28535f1~mv2_d_6016_4016_s_4_2.jpg/v1/fill/w_1920,h_1280,q_80,enc_avif,quality_auto/05f177_746831b1aa9d4c8fa5d6e2f0b28535f1~mv2_d_6016_4016_s_4_2.jpg') center/cover;
+  }
+  .visit-content { position: relative; z-index: 2; }
+  .visit-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 3rem; margin-top: 4rem;
+  }
+  .visit-card {
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    background: rgba(20,17,15,0.6);
+    backdrop-filter: blur(10px);
+  }
+  .visit-card h3 {
+    font-family: var(--serif); font-size: 1.4rem; color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+  .visit-card p { font-size: 0.95rem; color: var(--cream-dim); margin-bottom: 0.5rem; }
+  .visit-card .big {
+    font-family: var(--serif); font-size: 1.3rem; color: var(--cream);
+    margin-bottom: 0.3rem;
+  }
+  .visit-phone {
+    font-family: var(--serif); font-size: 2rem; color: var(--gold);
+    text-decoration: none; display: inline-block; margin-top: 1rem;
+    transition: opacity 0.3s;
+  }
+  .visit-phone:hover { opacity: 0.8; }
+  .visit-map {
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    height: 100%;
+    min-height: 340px;
+    background: rgba(20,17,15,0.6);
+    backdrop-filter: blur(10px);
+  }
+  .visit-map iframe {
+    width: 100%; height: 100%; min-height: 340px;
+    border: 0; display: block;
+    filter: grayscale(0.5) contrast(1.1) brightness(0.8) invert(0.08);
+  }
+  .visit-map .map-label {
+    padding: 1rem 1.5rem;
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); border-bottom: 1px solid var(--border);
+  }
+  .visit-map .map-link {
+    display: block; padding: 0.8rem 1.5rem;
+    font-size: 0.75rem; color: var(--cream-dim); text-decoration: none;
+    border-top: 1px solid var(--border); transition: color 0.3s;
+  }
+  .visit-map .map-link:hover { color: var(--gold); }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--bg); padding: 4rem 3rem 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem;
+  }
+  .footer-logo {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .footer-logo img {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    object-fit: contain;
+  }
+  .footer-logo-text {
+    font-family: var(--serif); font-size: 1.8rem; color: var(--cream);
+  }
+  .footer-logo-text span { color: var(--gold); }
+  .footer-tag { font-size: 0.85rem; color: var(--cream-dim); font-style: italic; font-family: var(--serif); }
+  .footer-col h4 {
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+  }
+  .footer-col a {
+    display: block; font-size: 0.85rem; color: var(--cream-dim);
+    text-decoration: none; margin-bottom: 0.5rem; transition: color 0.3s;
+  }
+  .footer-col a:hover { color: var(--gold); }
+  .footer-bottom {
+    padding-top: 2rem; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.75rem; color: var(--cream-dim);
+  }
+
+  /* ===== ANIMATIONS ===== */
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 1s ease, transform 1s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.15s; }
+  .reveal-delay-2 { transition-delay: 0.3s; }
+  .reveal-delay-3 { transition-delay: 0.45s; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (min-width: 901px) {
+    .menu-buttons { flex-direction: row !important; }
+    .menu-buttons a { width: auto !important; max-width: none !important; }
+  }
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links, .nav-cta { display: none; }
+    .nav-mobile { display: flex; }
+    section { padding: 5rem 1.5rem; }
+    .story-grid, .menu-grid, .visit-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .visit-map { min-height: 280px; }
+    .visit-map iframe { min-height: 280px; }
+    .exp-grid { grid-template-columns: 1fr; }
+    .hightea-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .hightea-form-row { grid-template-columns: 1fr; }
+    .gallery-grid { grid-template-columns: repeat(6, 1fr); }
+    .gallery-item.big, .gallery-item.wide { grid-column: span 3; }
+    .carousel { height: 50vh; min-height: 320px; }
+    .carousel-arrows { padding: 0 1rem; }
+    .carousel-arrow { width: 40px; height: 40px; font-size: 1rem; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="loader-ring">
+    <img src="assets/logo.png" class="loader-logo" alt="Papà Brizio">
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <img src="assets/logo.png" alt="Papà Brizio">
+    <div class="nav-logo-text">Papà Brizio<span>Ristorante · Espresso</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#story">Our Story</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#hightea">High Tea</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#visit">Visit</a></li>
+  </ul>
+  <a href="https://www.montrose.org.nz/all-products" target="_blank" class="nav-cta">Order Online</a>
+  <div class="nav-mobile" id="navMobile">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Ristorante · Espresso Lounge</div>
+    <h1>Papà <span class="accent">Brizio</span></h1>
+    <p class="hero-sub">Where flavor, comfort & style meet in Mairangi Bay</p>
+    <div class="hero-buttons">
+      <a href="https://www.montrose.org.nz/all-products" target="_blank" class="btn-primary">Order Online</a>
+      <a href="#visit" class="btn-outline">Visit Us</a>
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- STORY -->
+<section class="story" id="story">
+  <div class="container">
+    <div class="story-grid">
+      <div class="story-img reveal">
+        <img src="https://static.wixstatic.com/media/05f177_82f6630375474f0d82ff9595168cbd4e~mv2_d_6016_4016_s_4_2.jpg/v1/fill/w_800,h_1000,q_90,enc_avif,quality_auto/05f177_82f6630375474f0d82ff9595168cbd4e~mv2_d_6016_4016_s_4_2.jpg" alt="Papà Brizio interior">
+      </div>
+      <div class="story-text reveal reveal-delay-1">
+        <div class="section-label">Our Story</div>
+        <h2 class="section-title">A taste of <span class="italic">Italy</span><br>by the bay</h2>
+        <p>Nestled in the heart of Mairangi Bay, Papà Brizio is where flavor, comfort, and style meet. Whether you're after a relaxed morning coffee, a cozy brunch, or evening cocktails with friends, Papa's offers something special for every moment of the day.</p>
+        <p>Start your mid-morning with artisan coffee and fresh pastries, or savor our chef-crafted brunch dishes made with locally sourced ingredients. By afternoon, enjoy light bites and vibrant bistro favorites.</p>
+        <p>As the sun sets, we transform into a lively bar with curated wines, craft beers, homemade Limoncello and signature cocktails — best enjoyed with our delicious pizza, pasta and risotto. Don't miss the slow-cooked lamb shanks.</p>
+        <div class="story-signature">Come for the coffee. Stay for the atmosphere.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="experience" id="experience">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Three Moments</div>
+      <h2 class="section-title">Your <span class="italic">everyday</span> escape</h2>
+    </div>
+    <div class="exp-grid">
+      <div class="exp-card reveal">
+        <img src="https://static.wixstatic.com/media/05f177_746831b1aa9d4c8fa5d6e2f0b28535f1~mv2_d_6016_4016_s_4_2.jpg/v1/fill/w_600,h_800,q_90,enc_avif,quality_auto/05f177_746831b1aa9d4c8fa5d6e2f0b28535f1~mv2_d_6016_4016_s_4_2.jpg" alt="Morning at Papà Brizio">
+        <div class="exp-overlay">
+          <div class="exp-title">Morning</div>
+          <div class="exp-time">Morning at Papà Brizio · 8am — 12pm</div>
+          <div class="exp-desc">Artisan coffee, fresh pastries & chef-crafted brunch</div>
+        </div>
+      </div>
+      <div class="exp-card reveal reveal-delay-1">
+        <img src="https://static.wixstatic.com/media/05f177_82f6630375474f0d82ff9595168cbd4e~mv2_d_6016_4016_s_4_2.jpg/v1/fill/w_600,h_800,q_90,enc_avif,quality_auto/05f177_82f6630375474f0d82ff9595168cbd4e~mv2_d_6016_4016_s_4_2.jpg" alt="Afternoon at Papà Brizio">
+        <div class="exp-overlay">
+          <div class="exp-title">Afternoon</div>
+          <div class="exp-time">Afternoon at Papà Brizio · 12pm — 5pm</div>
+          <div class="exp-desc">Light bites, bistro favorites & a quiet solo break</div>
+        </div>
+      </div>
+      <div class="exp-card reveal reveal-delay-2">
+        <img src="https://static.wixstatic.com/media/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg/v1/fill/w_600,h_800,q_90,enc_avif,quality_auto/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg" alt="Evening at Papà Brizio">
+        <div class="exp-overlay">
+          <div class="exp-title">Evening</div>
+          <div class="exp-time">Evening at Papà Brizio · 5pm — Late</div>
+          <div class="exp-desc">Curated wines, signature cocktails, pizza & pasta</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU PREVIEW -->
+<section class="menu-preview" id="menu">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:1rem;">
+      <div class="section-label">A Taste</div>
+      <h2 class="section-title">From our <span class="italic">kitchen</span></h2>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-col reveal">
+        <h3>Kitchen Favourites</h3>
+        <div class="menu-item">
+          <div>
+            <div class="menu-item-name">Slow-Cooked Lamb Shanks</div>
+            <span class="menu-item-desc">Fall-off-the-bone tender, chef's recommendation</span>
+          </div>
+          <div class="menu-item-price">—</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-item-name">Trio of Salmon</div>
+            <span class="menu-item-desc">Three preparations, locally sourced</span>
+          </div>
+          <div class="menu-item-price">—</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-item-name">Wood-Fired Pizza</div>
+            <span class="menu-item-desc">Classic Italian, made to order</span>
+          </div>
+          <div class="menu-item-price">—</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-item-name">House-Made Pasta & Risotto</div>
+            <span class="menu-item-desc">Fresh daily, seasonal ingredients</span>
+          </div>
+          <div class="menu-item-price">—</div>
+        </div>
+      </div>
+      <div class="menu-col reveal reveal-delay-1">
+        <h3>Bar & Sweets</h3>
+        <div class="menu-item">
+          <div>
+            <div class="menu-item-name">Homemade Limoncello</div>
+            <span class="menu-item-desc">House recipe, aged to perfection</span>
+          </div>
+          <div class="menu-item-price">—</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-item-name">Signature Cocktails</div>
+            <span class="menu-item-desc">Curated by our mixologists</span>
+          </div>
+          <div class="menu-item-price">—</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-item-name">Panna Cotta</div>
+            <span class="menu-item-desc">Silky, classic Italian dessert</span>
+          </div>
+          <div class="menu-item-price">—</div>
+        </div>
+        <div class="menu-item">
+          <div>
+            <div class="menu-item-name">Curated Wine List</div>
+            <span class="menu-item-desc">Local & Italian selections</span>
+          </div>
+          <div class="menu-item-price">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="menu-buttons reveal" style="text-align:center;margin-top:3rem;display:flex;flex-direction:column;gap:1rem;align-items:center;">
+      <a href="https://sleek-quail-6ftr.here.now/menu.html" class="btn-outline" style="display:block;width:100%;max-width:280px;">View Full Menu</a>
+      <a href="https://www.montrose.org.nz/all-products" target="_blank" class="btn-primary" style="display:block;width:100%;max-width:280px;">Order Online</a>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY CAROUSEL -->
+<section class="gallery" id="gallery">
+  <div class="gallery-header reveal">
+    <div class="section-label">Moments</div>
+    <h2 class="section-title">The <span class="italic">atmosphere</span></h2>
+  </div>
+  <div class="carousel" id="carousel">
+    <div class="carousel-track" id="track">
+      <div class="carousel-slide active">
+        <img src="https://static.wixstatic.com/media/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg/v1/fill/w_1920,h_1280,q_90,enc_avif,quality_auto/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg" alt="Papà Brizio dining">
+        <div class="carousel-overlay"></div>
+        <div class="carousel-caption">
+          <div class="carousel-caption-label">The Room</div>
+          <div class="carousel-caption-title">Where <span class="italic">flavour</span> meets comfort</div>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <img src="https://static.wixstatic.com/media/05f177_82f6630375474f0d82ff9595168cbd4e~mv2_d_6016_4016_s_4_2.jpg/v1/fill/w_1920,h_1280,q_90,enc_avif,quality_auto/05f177_82f6630375474f0d82ff9595168cbd4e~mv2_d_6016_4016_s_4_2.jpg" alt="Papà Brizio interior">
+        <div class="carousel-overlay"></div>
+        <div class="carousel-caption">
+          <div class="carousel-caption-label">The Interior</div>
+          <div class="carousel-caption-title">A warm <span class="italic">embrace</span> by the bay</div>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <img src="https://static.wixstatic.com/media/05f177_14f4824b98054ff5b183519ab49ed7a4~mv2_d_4087_2728_s_4_2.jpg/v1/fill/w_1920,h_1280,q_90,enc_avif,quality_auto/Trio%20salmon_JPG.jpg" alt="Trio of salmon">
+        <div class="carousel-overlay"></div>
+        <div class="carousel-caption">
+          <div class="carousel-caption-label">From the Kitchen</div>
+          <div class="carousel-caption-title">Trio of <span class="italic">salmon</span>, locally sourced</div>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <img src="https://static.wixstatic.com/media/05f177_b45384f62821488f93b7a34edcd5667f~mv2_d_5459_3644_s_4_2.jpg/v1/fill/w_1920,h_1280,q_90,enc_avif,quality_auto/Panna%20cotta_JPG.jpg" alt="Panna cotta">
+        <div class="carousel-overlay"></div>
+        <div class="carousel-caption">
+          <div class="carousel-caption-label">Sweet Endings</div>
+          <div class="carousel-caption-title">Panna <span class="italic">cotta</span> — silky, classic</div>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <img src="https://static.wixstatic.com/media/05f177_746831b1aa9d4c8fa5d6e2f0b28535f1~mv2_d_6016_4016_s_4_2.jpg/v1/fill/w_1920,h_1280,q_90,enc_avif,quality_auto/05f177_746831b1aa9d4c8fa5d6e2f0b28535f1~mv2_d_6016_4016_s_4_2.jpg" alt="Papà Brizio ambiance">
+        <div class="carousel-overlay"></div>
+        <div class="carousel-caption">
+          <div class="carousel-caption-label">The Vibe</div>
+          <div class="carousel-caption-title">Come for the <span class="italic">coffee</span>, stay for the atmosphere</div>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-arrows">
+      <div class="carousel-arrow" id="prevArrow">‹</div>
+      <div class="carousel-arrow" id="nextArrow">›</div>
+    </div>
+    <div class="carousel-dots" id="dots"></div>
+    <div class="carousel-progress" id="progress" style="width:0"></div>
+  </div>
+</section>
+
+<!-- HIGH TEA -->
+<section class="hightea" id="hightea">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-label">By Appointment</div>
+      <h2 class="section-title">High Tea in <span class="italic">Mairangi Bay</span></h2>
+      <p style="font-size:1.15rem;color:#fff;max-width:700px;margin:1rem auto 0;opacity:0.85;line-height:1.7;">High tea is a great way to experience many different flavours — 3 hot savouries, a selection of 3 sandwiches and 5 yummy desserts. Start with a lovely glass of bubbles, work your way through the layers of beautiful food, enjoy a tea or coffee at any stage of your journey. An amazing way to catch up.</p>
+    </div>
+    <div class="hightea-grid">
+      <div class="hightea-images reveal">
+        <img src="https://static.wixstatic.com/media/05f177_1cbd85db21e5425f9d0bc921fa794946~mv2.jpg/v1/fill/w_400,h_600,q_90,enc_avif,quality_auto/05f177_1cbd85db21e5425f9d0bc921fa794946~mv2.jpg" alt="High tea spread">
+        <img src="https://static.wixstatic.com/media/05f177_619f3d1733d341d188114cc89a88ba5ef000.jpg/v1/fill/w_350,h_300,q_90,enc_avif,quality_auto/05f177_619f3d1733d341d188114cc89a88ba5ef000.jpg" alt="High tea sweets">
+        <img src="https://static.wixstatic.com/media/05f177_1d98fb5945c74aaca996f0634f5bcdba~mv2.jpg/v1/fill/w_500,h_280,q_90,enc_avif,quality_auto/05f177_1d98fb5945c74aaca996f0634f5bcdba~mv2.jpg" alt="High tea table">
+      </div>
+      <div class="hightea-info reveal reveal-delay-1">
+        <div class="hightea-pricing">
+          <div class="hightea-price-card">
+            <div class="price">$58<span class="pp"> /pp</span></div>
+            <div class="desc">Bubbles, tea & high tea</div>
+          </div>
+          <div class="hightea-price-card">
+            <div class="price">$50<span class="pp"> /pp</span></div>
+            <div class="desc">Tea/coffee & high tea</div>
+          </div>
+        </div>
+        <div class="hightea-details">
+          <p><strong>What's included:</strong> 3 hot savouries, selection of 3 sandwiches, 5 yummy desserts</p>
+          <p><strong>When:</strong> 2pm – 5pm, Tuesday – Sunday</p>
+          <p><strong>Book by:</strong> Reservations must be made before 10am on the day</p>
+          <p><strong>Minimum:</strong> 2 people — groups welcome</p>
+          <p><strong>Deposit:</strong> $70 for all bookings<br>
+          Bank: 12-3016-0579356-00 · Ref: Your Name · Code: Booking Date<br>
+          All deposits refunded if cancelled 24hrs prior.</p>
+        </div>
+        <div style="margin:1.5rem 0;padding:1.5rem;border-left:3px solid var(--gold);background:rgba(10,9,8,0.4);">
+          <p style="font-size:1.05rem;color:#fff;line-height:1.7;margin-bottom:0.8rem;">While you're here, have a stroll to the beach & check out the great shops in the village.</p>
+          <p style="font-size:1.05rem;color:#fff;line-height:1.7;margin-bottom:0.8rem;"><strong style="color:var(--gold);">Real food, real service, real people.</strong></p>
+          <p style="font-size:1rem;color:var(--cream-dim);line-height:1.6;">Allergies specialist — we pride ourselves on full separation to ensure your dining experience. Let us know when booking your table.</p>
+        </div>
+        <div style="margin:1.5rem 0;">
+          <p style="font-size:1.05rem;color:#fff;"><strong style="color:var(--gold);">Fully trained baristas</strong> delivering exceptional coffee from Atlas Power Roast — organic milk or choose from many milk substitutes.</p>
+        </div>
+        <form class="hightea-form" onsubmit="handleHighTeaBooking(event)">
+          <div class="hightea-form-row">
+            <div>
+              <label>Name *</label>
+              <input type="text" required placeholder="Your name">
+            </div>
+            <div>
+              <label>Phone No. *</label>
+              <input type="tel" required placeholder="09 478 9610">
+            </div>
+          </div>
+          <div class="hightea-form-row">
+            <div>
+              <label>Email *</label>
+              <input type="email" required placeholder="you@email.com">
+            </div>
+            <div>
+              <label>Number for High Tea *</label>
+              <input type="number" required min="2" placeholder="2">
+            </div>
+          </div>
+          <div class="hightea-form-row">
+            <div>
+              <label>Date *</label>
+              <input type="date" required>
+            </div>
+            <div>
+              <label>Time *</label>
+              <select required>
+                <option value="">Select time</option>
+                <option>2:00 PM</option>
+                <option>2:30 PM</option>
+                <option>3:00 PM</option>
+                <option>3:30 PM</option>
+                <option>4:00 PM</option>
+                <option>4:30 PM</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label>High Tea Details</label>
+            <textarea placeholder="Any special requests, dietary requirements, allergies, or occasion details..."></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Book High Tea</button>
+          <p class="hightea-form-note">We'll confirm your booking by phone or email. A $70 deposit is required to secure your spot — refunded if cancelled 24hrs prior.</p>
+        </form>
+        <p style="margin-top:1.5rem;font-size:0.9rem;color:var(--cream-dim);font-style:italic;">Follow us on <a href="https://www.facebook.com/montrosestreetfood/" target="_blank" style="color:var(--gold);">Facebook</a> for special events. Come dine with us. Food is subject to change and may not be the same as above pictures.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISIT -->
+<section class="visit" id="visit">
+  <div class="visit-bg"></div>
+  <div class="container visit-content">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-label">Find Us</div>
+      <h2 class="section-title">Visit <span class="italic">Papà</span></h2>
+    </div>
+    <div class="visit-grid">
+      <div class="visit-card reveal">
+        <h3>Location</h3>
+        <p class="big">1 Montrose Terrace</p>
+        <p>Mairangi Bay, Auckland 0630</p>
+        <p>Just steps from the beach</p>
+        <p style="margin-top:1rem;">Loads of parking behind the building</p>
+      </div>
+      <div class="visit-card reveal reveal-delay-1">
+        <h3>Hours</h3>
+        <p>Tuesday · 10am – 9pm</p>
+        <p>Wednesday – Sunday · 10am – 10pm</p>
+        <p style="margin-top:1rem;color:var(--gold);">Fully Licensed Bar</p>
+        <p><abbr title="Bring Your Own Wine" style="text-decoration:underline dotted;text-underline-offset:3px;cursor:help;color:var(--gold);">BYOW</abbr> Wednesday & Thursday</p>
+        <p style="font-size:0.75rem;margin-top:0.3rem;">Corkage applies</p>
+        <a href="tel:094789610" class="visit-phone">📞 09 478 9610</a>
+      </div>
+      <div class="visit-map reveal reveal-delay-2">
+        <div class="map-label">Find Us on the Map</div>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d799.3387483082302!2d174.75298740546356!3d-36.73804929106899!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6d0d3a163f98db75%3A0x63c1d7dc41d8aa09!2sMontrose%20Cafe%2C%20Bistro%20and%20Bar!5e0!3m2!1sen!2snz!4v1782083098170!5m2!1sen!2snz" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Map of Montrose Cafe, Bistro and Bar"></iframe>
+        <a href="https://www.google.com/maps/search/?api=1&query=Montrose+Cafe+Bistro+Bar+Mairangi+Bay" target="_blank" class="map-link">Open in Google Maps →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <img src="assets/logo.png" alt="Papà Brizio">
+          <div class="footer-logo-text">Papà <span>Brizio</span></div>
+        </div>
+        <p class="footer-tag">Ristorante · Espresso Lounge</p>
+        <p style="margin-top:1rem;font-size:0.85rem;color:var(--cream-dim);max-width:300px;">Come for the coffee. Stay for the atmosphere. Return for the experience.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <a href="#story">Our Story</a>
+        <a href="#experience">Experience</a>
+        <a href="#menu">Menu</a>
+        <a href="#hightea">High Tea</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#visit">Visit</a>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <a href="tel:094789610">📞 09 478 9610</a>
+        <a href="https://www.montrose.org.nz/all-products" target="_blank">Order Online</a>
+        <a href="https://www.montrose.org.nz/" target="_blank">Montrose Cafe Bistro Bar</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Papà Brizio · 1 Montrose Terrace, Mairangi Bay</span>
+      <span>Crafted with intention.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Loader
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('loader').classList.add('done'), 800);
+  });
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Mobile nav toggle
+  const navMobile = document.getElementById('navMobile');
+  const navLinks = document.querySelector('.nav-links');
+  navMobile?.addEventListener('click', () => {
+    navLinks.style.display = navLinks.style.display === 'flex' ? '' : 'flex';
+    navLinks.style.flexDirection = 'column';
+    navLinks.style.position = 'absolute';
+    navLinks.style.top = '100%';
+    navLinks.style.left = '0';
+    navLinks.style.right = '0';
+    navLinks.style.background = 'rgba(10,9,8,0.95)';
+    navLinks.style.padding = '2rem';
+    navLinks.style.gap = '1.5rem';
+  });
+
+  // Carousel
+  const track = document.getElementById('track');
+  const slides = track ? track.children : [];
+  const dotsContainer = document.getElementById('dots');
+  const progressBar = document.getElementById('progress');
+  const prevArrow = document.getElementById('prevArrow');
+  const nextArrow = document.getElementById('nextArrow');
+  let currentSlide = 0;
+  let autoTimer = null;
+  let progressTimer = null;
+  const SLIDE_DURATION = 5000;
+
+  function buildDots() {
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < slides.length; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => goToSlide(i));
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  function goToSlide(n) {
+    currentSlide = ((n % slides.length) + slides.length) % slides.length;
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    [...slides].forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+    [...dotsContainer.children].forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+    resetAuto();
+  }
+
+  function nextSlide() { goToSlide(currentSlide + 1); }
+  function prevSlide() { goToSlide(currentSlide - 1); }
+
+  function resetAuto() {
+    clearInterval(autoTimer);
+    clearInterval(progressTimer);
+    progressBar.style.width = '0%';
+    let elapsed = 0;
+    progressTimer = setInterval(() => {
+      elapsed += 50;
+      progressBar.style.width = (elapsed / SLIDE_DURATION * 100) + '%';
+    }, 50);
+    autoTimer = setInterval(nextSlide, SLIDE_DURATION);
+  }
+
+  if (track && slides.length > 0) {
+    buildDots();
+    prevArrow?.addEventListener('click', prevSlide);
+    nextArrow?.addEventListener('click', nextSlide);
+    // Pause on hover
+    const carousel = document.getElementById('carousel');
+    carousel?.addEventListener('mouseenter', () => { clearInterval(autoTimer); clearInterval(progressTimer); });
+    carousel?.addEventListener('mouseleave', resetAuto);
+    // Touch swipe
+    let touchStartX = 0;
+    carousel?.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+    carousel?.addEventListener('touchend', e => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) { diff > 0 ? nextSlide() : prevSlide(); }
+    });
+    resetAuto();
+  }
+
+  // High Tea booking form
+  function handleHighTeaBooking(e) {
+    e.preventDefault();
+    const form = e.target;
+    const name = form.querySelector('input[type=text]').value;
+    const phone = form.querySelector('input[type=tel]').value;
+    const email = form.querySelector('input[type=email]').value;
+    const num = form.querySelector('input[type=number]').value;
+    const date = form.querySelector('input[type=date]').value;
+    const time = form.querySelector('select').value;
+    const details = form.querySelector('textarea').value;
+    const subject = encodeURIComponent('High Tea Booking — ' + name);
+    const body = encodeURIComponent(
+      'Name: ' + name + '\\n' +
+      'Phone: ' + phone + '\\n' +
+      'Email: ' + email + '\\n' +
+      'Number for High Tea: ' + num + '\\n' +
+      'Date: ' + date + '\\n' +
+      'Time: ' + time + '\\n' +
+      'Details: ' + (details || 'None')
+    );
+    window.location.href = 'mailto:montrosecafe@xtra.co.nz?subject=' + subject + '&body=' + body;
+  }
+</script>
+</body>
+</html>

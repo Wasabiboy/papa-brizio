@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu — Papà Brizio | Ristorante & Espresso Lounge</title>
+<meta name="description" content="Full menu at Papà Brizio — coffee, breakfast, lunch, dinner, desserts & drinks. Order online for pickup.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0908;
+    --bg-warm: #14110f;
+    --cream: #f5f0e8;
+    --cream-dim: #c9c1b3;
+    --gold: #c9a96e;
+    --gold-bright: #e0c489;
+    --border: rgba(201, 169, 110, 0.15);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--cream); font-family: var(--sans); font-weight: 300; overflow-x: hidden; line-height: 1.6; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1rem 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(10, 9, 8, 0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+  .nav-logo img { width: 64px; height: 64px; border-radius: 50%; object-fit: contain; flex-shrink: 0; }
+  .nav-logo-text { font-family: var(--serif); font-size: 1.1rem; font-weight: 500; color: var(--cream); line-height: 1; }
+  .nav-logo-text span { display: block; font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream-dim); margin-top: 0.15rem; }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; align-items: center; }
+  .nav-links a { font-size: 0.95rem; letter-spacing: 0.12em; text-transform: uppercase; color: #fff; text-decoration: none; transition: color 0.3s; }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta { padding: 0.6rem 1.5rem; border: 1px solid var(--gold); color: var(--gold); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; transition: all 0.3s; }
+  .nav-cta:hover { background: var(--gold); color: var(--bg); }
+
+  .menu-header { padding: 8rem 3rem 3rem; text-align: center; background: var(--bg-warm); }
+  .section-label { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+  .section-title { font-family: var(--serif); font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 400; line-height: 1.05; margin-bottom: 1rem; }
+  .section-title .italic { font-style: italic; color: var(--gold); }
+  .menu-info { max-width: 600px; margin: 0 auto; font-size: 0.85rem; color: var(--cream-dim); line-height: 1.8; }
+  .dietary-key { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 1.5rem; font-size: 0.7rem; color: var(--cream-dim); }
+  .dietary-key span { display: flex; align-items: center; gap: 0.3rem; }
+  .dietary-key code { color: var(--gold); font-family: var(--sans); font-size: 0.65rem; }
+
+  .cat-nav { position: sticky; top: 64px; z-index: 50; background: rgba(10,9,8,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 1rem 3rem; display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+  .cat-nav a { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--cream-dim); text-decoration: none; transition: color 0.3s; padding: 0.3rem 0; border-bottom: 1px solid transparent; }
+  .cat-nav a:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .menu-section { padding: 4rem 3rem; max-width: 900px; margin: 0 auto; }
+  .menu-section:nth-child(even) { background: var(--bg-warm); }
+  .cat-title { font-family: var(--serif); font-size: 2rem; font-weight: 400; color: var(--gold); margin-bottom: 0.5rem; }
+  .cat-desc { font-size: 0.85rem; color: var(--cream-dim); margin-bottom: 2rem; font-style: italic; font-family: var(--serif); }
+
+  .menu-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 1.2rem 0; border-bottom: 1px solid rgba(201,169,110,0.08); transition: padding-left 0.3s; }
+  .menu-item:hover { padding-left: 0.5rem; }
+  .menu-item-info { flex: 1; }
+  .menu-item-name { font-family: var(--serif); font-size: 1.44rem; color: #fff; }
+  .menu-item-tags { font-size: 0.65rem; color: var(--gold); margin-left: 0.5rem; letter-spacing: 0.1em; }
+  .menu-item-desc { font-size: 0.96rem; color: #fff; opacity: 0.8; margin-top: 0.3rem; }
+  .menu-item-price { font-family: var(--serif); font-size: 1.44rem; color: var(--gold); font-weight: 500; white-space: nowrap; }
+  .menu-item-note { font-size: 0.7rem; color: var(--cream-dim); margin-top: 0.2rem; font-style: italic; }
+
+  .order-banner { text-align: center; padding: 4rem 3rem; background: var(--bg); }
+  .order-banner a { display: inline-block; padding: 1rem 2.5rem; background: var(--gold); color: var(--bg); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; font-weight: 500; transition: all 0.3s; }
+  .order-banner a:hover { background: var(--gold-bright); transform: translateY(-2px); }
+
+  footer { background: var(--bg); padding: 4rem 3rem 2rem; border-top: 1px solid var(--border); text-align: center; }
+  .footer-logo { display: flex; align-items: center; gap: 1rem; justify-content: center; margin-bottom: 0.5rem; }
+  .footer-logo img { width: 88px; height: 88px; border-radius: 50%; object-fit: contain; }
+  .footer-logo-text { font-family: var(--serif); font-size: 1.6rem; color: var(--cream); }
+  .footer-logo-text span { color: var(--gold); }
+  .footer-bottom { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--cream-dim); }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .menu-header, .menu-section, .order-banner { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .cat-nav { padding: 0.8rem 1rem; gap: 1rem; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://sleek-quail-6ftr.here.now/" class="nav-logo">
+    <img src="assets/logo.png" alt="Papà Brizio">
+    <div class="nav-logo-text">Papà Brizio<span>Ristorante · Espresso</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="https://sleek-quail-6ftr.here.now/#story">Story</a></li>
+    <li><a href="https://sleek-quail-6ftr.here.now/#experience">Experience</a></li>
+    <li><a href="https://sleek-quail-6ftr.here.now/#menu">Menu</a></li>
+    <li><a href="https://sleek-quail-6ftr.here.now/#gallery">Gallery</a></li>
+    <li><a href="https://sleek-quail-6ftr.here.now/#visit">Visit</a></li>
+  </ul>
+  <a href="https://www.montrose.org.nz/all-products" target="_blank" class="nav-cta">Order Online</a>
+</nav>
+
+<div class="menu-header">
+  <div class="section-label">Our Menu</div>
+  <h1 class="section-title">From <span class="italic">Papà's</span> kitchen</h1>
+  <p class="menu-info">Open Wednesday–Sunday · 8am–8pm<br>Place your order anytime, note your pickup time · Pay in-store or online</p>
+  <div class="dietary-key">
+    <span><code>(GF)</code> Gluten Free</span>
+    <span><code>(GF^)</code> Can be made GF</span>
+    <span><code>(V)</code> Vegetarian</span>
+    <span><code>(VG)^</code> Vegan</span>
+    <span><code>(K)</code> Keto</span>
+  </div>
+  <p style="margin-top:1rem;font-size:0.7rem;color:var(--cream-dim);max-width:500px;margin-left:auto;margin-right:auto;">We use a separate gluten-free fryer and section, but cannot 100% guarantee against trace elements. Please advise us of specific dietary requirements. Menu subject to change.</p>
+</div>
+
+<div class="cat-nav">
+  <a href="#breakfast">Breakfast</a>
+  <a href="#coffee">Coffee & Hot Drinks</a>
+  <a href="#cold">Cold Drinks</a>
+  <a href="#starters">Starters & Sharing</a>
+  <a href="#mains">Mains</a>
+  <a href="#salads">Salads</a>
+  <a href="#sweets">Desserts</a>
+  <a href="#bar">Bar</a>
+</div>
+
+<!-- BREAKFAST -->
+<section class="menu-section" id="breakfast">
+  <h2 class="cat-title">Breakfast</h2>
+  <p class="cat-desc">Served from open until midday</p>
+
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Breakfast Bap + Large Hot Beverage Combo <span class="menu-item-tags">$13.50 combo</span></div>
+      <div class="menu-item-desc">Bacon, egg bap with aioli and tomato sauce. Choice of large hot beverage.</div>
+    </div>
+    <div class="menu-item-price">$13.50</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Breakfast Bap</div>
+      <div class="menu-item-desc">Bacon, egg, tomato sauce, aioli</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Breakfast on the Go <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">Scrambled eggs, hash browns, sausages</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Waffles with Bacon, Banana & Maple Syrup</div>
+      <div class="menu-item-desc">Delicious with cinnamon and vanilla notes, bacon, banana, maple</div>
+    </div>
+    <div class="menu-item-price">$22.50</div>
+  </div>
+</section>
+
+<!-- COFFEE -->
+<section class="menu-section" id="coffee">
+  <h2 class="cat-title">Coffee & Hot Drinks</h2>
+  <p class="cat-desc">Artisan coffee, freshly made</p>
+
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Cappuccino</div>
+      <div class="menu-item-desc">Choice of cup size, milk type, optional sugar/decaf</div>
+    </div>
+    <div class="menu-item-price">$5.80</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Latte</div>
+      <div class="menu-item-desc">Choice of cup size, milk type, optional sugar/decaf</div>
+    </div>
+    <div class="menu-item-price">$5.80</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Hot Chocolate <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">Choice of cup size, milk type</div>
+    </div>
+    <div class="menu-item-price">$5.80</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Iced Coffee / Chocolate Blended</div>
+      <div class="menu-item-desc">Choice of flavour</div>
+    </div>
+    <div class="menu-item-price">$8.00</div>
+  </div>
+</section>
+
+<!-- COLD DRINKS -->
+<section class="menu-section" id="cold">
+  <h2 class="cat-title">Cold Drinks</h2>
+  <p class="cat-desc">Smoothies, milkshakes & refreshments</p>
+
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Fresh Real Fruit Smoothies <span class="menu-item-tags">(GF) (DF)</span></div>
+      <div class="menu-item-desc">Montrose: Passionfruit, Peach, Mango · Spirulina: Banana, Mango, Spirulina · Berry Blast: Mixed Berries · Panana: Banana & Passionfruit</div>
+    </div>
+    <div class="menu-item-price">$8.50</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Real Fruit Milkshakes <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">Strawberry · Chocolate · Banana · Vanilla · Peanut Butter & Nutella · Salted Caramel · Popcorn · Bounty (chocolate/coconut). Dairy-free with almond or soy milk.</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Drink Cans</div>
+      <div class="menu-item-desc">Coke · Sprite · Coke No Sugar · Sprite Zero · L&P</div>
+    </div>
+    <div class="menu-item-price">$4.00</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Ice Cream Sundae (Large)</div>
+      <div class="menu-item-desc">Chocolate · Strawberry · Salted Caramel</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+</section>
+
+<!-- STARTERS -->
+<section class="menu-section" id="starters">
+  <h2 class="cat-title">Starters & Sharing</h2>
+  <p class="cat-desc">Street food to share — Mairangi Bay's favourite</p>
+
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Crispy Vegetable Spring Rolls <span class="menu-item-tags">(V) (VG)</span></div>
+      <div class="menu-item-desc">Carrots, cabbage, bean sprouts, chickpeas, spicy beans, garden salad and dipping sauce. 4 large rolls.</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Chicken Tenders & Chips <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">In-house crumbed chicken tenders, gluten free. Swap option available.</div>
+    </div>
+    <div class="menu-item-price">$14.00</div>
+  </div>
+</section>
+
+<!-- MAINS -->
+<section class="menu-section" id="mains">
+  <h2 class="cat-title">Mains</h2>
+  <p class="cat-desc">Hearty, chef-crafted dishes for lunch & dinner</p>
+
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Slow-Cooked Lamb Shanks</div>
+      <div class="menu-item-desc">Chef's recommendation — fall-off-the-bone tender</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Fettuccine — Bacon, Chicken & Mushrooms</div>
+      <div class="menu-item-desc">Creamy sauce, house-made pasta</div>
+    </div>
+    <div class="menu-item-price">$33.00</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Swedish Beef Meatballs <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">NZ beef Swedish style, rich creamy Swedish sauce on potato mash</div>
+    </div>
+    <div class="menu-item-price">$33.00</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Slow-Cooked Pork Belly, Asian Spiced <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">Asian spices, kumara mash, ginger, bok choy, capsicum, port wine jus, crispy crackling</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Roast Lamb Dinner <span class="menu-item-tags">(GF) (DF)</span></div>
+      <div class="menu-item-desc">Roast lamb leg with crispy potatoes, golden kumara, pumpkin, roasted carrot, peas, gravy & mint sauce. Sundays only.</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Fish & Chips <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">Fresh John Dory, crumbed or pan-fried, served with fries, lemon, tartare sauce and garden salad. 2 fillets.</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Snack Pack — Fresh John Dory & Fries <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">Crumbed John Dory, fries, salad, tartare sauce and lemon</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+</section>
+
+<!-- SALADS -->
+<section class="menu-section" id="salads">
+  <h2 class="cat-title">Salads</h2>
+  <p class="cat-desc">Fresh, vibrant — perfect on their own or as a side</p>
+
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Greek Salad <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">Spinach, tomato, olives, feta, cucumber, red onions, dressing</div>
+    </div>
+    <div class="menu-item-price">$25.00</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Waldorf Salad <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">Apple, celery, walnuts, grapes, cos lettuce, mayo</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Prawn & Mango Salad <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">Iceberg, prawns, mango, avocado, red onions, dressing</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+</section>
+
+<!-- DESSERTS -->
+<section class="menu-section" id="sweets">
+  <h2 class="cat-title">Desserts</h2>
+  <p class="cat-desc">Sweet endings — don't miss the panna cotta</p>
+
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Panna Cotta</div>
+      <div class="menu-item-desc">Silky, classic Italian dessert</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Chocolate Fudge Brownie <span class="menu-item-tags">(GF)</span></div>
+      <div class="menu-item-desc">Covered with chocolate sauce, served with vanilla ice cream</div>
+    </div>
+    <div class="menu-item-price">$17.00</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Apple Pie & Ice Cream</div>
+      <div class="menu-item-desc">Sweet short pastry, served with vanilla ice cream</div>
+    </div>
+    <div class="menu-item-price">$17.00</div>
+  </div>
+</section>
+
+<!-- BAR -->
+<section class="menu-section" id="bar">
+  <h2 class="cat-title">Bar</h2>
+  <p class="cat-desc">Fully licensed · BYOW Wednesday & Thursday (corkage applies)</p>
+
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Homemade Limoncello</div>
+      <div class="menu-item-desc">House recipe, aged to perfection</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Signature Cocktails</div>
+      <div class="menu-item-desc">Curated by our mixologists</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Curated Wine List</div>
+      <div class="menu-item-desc">Local & Italian selections</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+  <div class="menu-item">
+    <div class="menu-item-info">
+      <div class="menu-item-name">Craft Beers</div>
+      <div class="menu-item-desc">Local & imported</div>
+    </div>
+    <div class="menu-item-price">—</div>
+  </div>
+</section>
+
+<div class="order-banner">
+  <p style="margin-bottom:1.5rem;font-size:0.85rem;color:var(--cream-dim);">This is our online-only menu. For the full in-store menu, see our Google images.</p>
+  <a href="https://www.montrose.org.nz/all-products" target="_blank">Order Online Now</a>
+</div>
+
+<footer>
+  <div class="footer-logo">
+    <img src="assets/logo.png" alt="Papà Brizio">
+    <div class="footer-logo-text">Papà <span>Brizio</span></div>
+  </div>
+  <p style="font-size:0.85rem;color:var(--cream-dim);font-style:italic;font-family:var(--serif);">Ristorante · Espresso Lounge</p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--cream-dim);">1 Montrose Terrace, Mairangi Bay · 📞 09 478 9610</p>
+  <div class="footer-bottom">© 2026 Papà Brizio · Crafted with intention.</div>
+</footer>
+
+</body>
+</html>
