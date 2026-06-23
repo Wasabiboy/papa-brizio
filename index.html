@@ -378,71 +378,91 @@
   .hightea-form label { font-size: 0.9rem; color: var(--cream-dim); margin-bottom: 0.3rem; display: block; }
   .hightea-form .btn-primary { justify-self: start; cursor: pointer; border: none; font-family: var(--sans); }
   .hightea-form-note { font-size: 0.85rem; color: var(--cream-dim); font-style: italic; }
-  .gallery { background: var(--bg); overflow: hidden; padding: 0; }
-  .gallery-header { text-align: center; padding: 6rem 3rem 3rem; }
-  .carousel {
-    position: relative; width: 100%; height: 70vh; min-height: 480px;
-    overflow: hidden;
+  .gallery { background: var(--bg); overflow: hidden; padding: 6rem 3rem; }
+  .gallery-header { text-align: center; margin-bottom: 3rem; }
+  .gallery-filters {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem;
+    margin-bottom: 3rem;
   }
-  .carousel-track {
-    display: flex; height: 100%; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .carousel-slide {
-    min-width: 100%; height: 100%; position: relative;
-  }
-  .carousel-slide img {
-    width: 100%; height: 100%; object-fit: cover;
-    transform: scale(1.05); transition: transform 6s ease;
-  }
-  .carousel-slide.active img { transform: scale(1); }
-  .carousel-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(10,9,8,0.7) 0%, rgba(10,9,8,0.1) 50%, rgba(10,9,8,0.3) 100%);
-  }
-  .carousel-caption {
-    position: absolute; bottom: 3rem; left: 0; right: 0;
-    text-align: center; z-index: 2;
-    padding: 0 2rem;
-    animation: captionFade 0.8s ease 0.3s both;
-  }
-  @keyframes captionFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  .carousel-caption-label {
-    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 0.5rem;
-  }
-  .carousel-caption-title {
-    font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2.5rem);
-    font-weight: 400; color: var(--cream);
-  }
-  .carousel-caption-title .italic { font-style: italic; color: var(--gold); }
-  .carousel-arrows {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    width: 100%; display: flex; justify-content: space-between;
-    padding: 0 2rem; z-index: 3; pointer-events: none;
-  }
-  .carousel-arrow {
-    width: 52px; height: 52px; border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 50%; background: rgba(10,9,8,0.5); backdrop-filter: blur(8px);
-    color: var(--cream); font-size: 1.2rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.3s; pointer-events: auto;
-    flex-shrink: 0;
-  }
-  .carousel-arrow:hover { background: var(--gold); border-color: var(--gold); color: var(--bg); }
-  .carousel-dots {
-    position: absolute; bottom: 1.2rem; left: 0; right: 0;
-    display: flex; justify-content: center; gap: 0.6rem; z-index: 3;
-  }
-  .carousel-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: rgba(255,255,255,0.2); cursor: pointer;
+  .gallery-filter {
+    padding: 0.55rem 1.2rem;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--cream-dim);
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
     transition: all 0.3s;
   }
-  .carousel-dot.active { background: var(--gold); width: 28px; border-radius: 4px; }
-  .carousel-progress {
-    position: absolute; bottom: 0; left: 0; height: 2px;
-    background: var(--gold); z-index: 3; transition: width 0.1s linear;
+  .gallery-filter:hover { border-color: var(--gold); color: var(--gold); }
+  .gallery-filter.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--bg);
   }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+  .gallery-item {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    background: var(--bg-warm);
+  }
+  .gallery-item.hidden { display: none; }
+  .gallery-item img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .gallery-item:hover img { transform: scale(1.06); }
+  .gallery-item-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,9,8,0.85) 0%, transparent 55%);
+    opacity: 0; transition: opacity 0.35s ease;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 1.25rem;
+  }
+  .gallery-item:hover .gallery-item-overlay { opacity: 1; }
+  .gallery-item-cat {
+    font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.35rem;
+  }
+  .gallery-item-label {
+    font-family: var(--serif); font-size: 1.15rem; color: var(--cream);
+  }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(10,9,8,0.92);
+    backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+  .lightbox.open { opacity: 1; visibility: visible; }
+  .lightbox-inner { position: relative; max-width: 960px; width: 100%; }
+  .lightbox-inner img {
+    width: 100%; max-height: 80vh; object-fit: contain;
+    border: 1px solid var(--border);
+  }
+  .lightbox-caption {
+    text-align: center; margin-top: 1.25rem;
+  }
+  .lightbox-caption .gallery-item-cat { font-size: 0.7rem; }
+  .lightbox-caption .gallery-item-label { font-size: 1.5rem; }
+  .lightbox-close {
+    position: absolute; top: -2.5rem; right: 0;
+    background: none; border: none; color: var(--cream-dim);
+    font-size: 2rem; cursor: pointer; line-height: 1;
+    transition: color 0.3s;
+  }
+  .lightbox-close:hover { color: var(--gold); }
 
   /* ===== VISIT ===== */
   .visit {
@@ -565,11 +585,10 @@
     .exp-grid { grid-template-columns: 1fr; }
     .hightea-grid { grid-template-columns: 1fr; gap: 2.5rem; }
     .hightea-form-row { grid-template-columns: 1fr; }
-    .gallery-grid { grid-template-columns: repeat(6, 1fr); }
-    .gallery-item.big, .gallery-item.wide { grid-column: span 3; }
-    .carousel { height: 50vh; min-height: 320px; }
-    .carousel-arrows { padding: 0 1rem; }
-    .carousel-arrow { width: 40px; height: 40px; font-size: 1rem; }
+    .gallery { padding: 5rem 1.5rem; }
+    .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
+    .gallery-filters { gap: 0.4rem; }
+    .gallery-filter { padding: 0.45rem 0.85rem; font-size: 0.6rem; }
     .footer-grid { grid-template-columns: 1fr; }
     .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
   }
@@ -753,63 +772,26 @@
   </div>
 </section>
 
-<!-- GALLERY CAROUSEL -->
+<!-- GALLERY -->
 <section class="gallery" id="gallery">
   <div class="gallery-header reveal">
-    <div class="section-label">Moments</div>
-    <h2 class="section-title">The <span class="italic">atmosphere</span></h2>
+    <div class="section-label">From the Kitchen</div>
+    <h2 class="section-title">Our <span class="italic">gallery</span></h2>
   </div>
-  <div class="carousel" id="carousel">
-    <div class="carousel-track" id="track">
-      <div class="carousel-slide active">
-        <img src="https://static.wixstatic.com/media/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg/v1/fill/w_1920,h_1280,q_90,enc_avif,quality_auto/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg" alt="Papà Brizio dining">
-        <div class="carousel-overlay"></div>
-        <div class="carousel-caption">
-          <div class="carousel-caption-label">The Room</div>
-          <div class="carousel-caption-title">Where <span class="italic">flavour</span> meets comfort</div>
-        </div>
-      </div>
-      <div class="carousel-slide">
-        <img src="https://static.wixstatic.com/media/05f177_82f6630375474f0d82ff9595168cbd4e~mv2_d_6016_4016_s_4_2.jpg/v1/fill/w_1920,h_1280,q_90,enc_avif,quality_auto/05f177_82f6630375474f0d82ff9595168cbd4e~mv2_d_6016_4016_s_4_2.jpg" alt="Papà Brizio interior">
-        <div class="carousel-overlay"></div>
-        <div class="carousel-caption">
-          <div class="carousel-caption-label">The Interior</div>
-          <div class="carousel-caption-title">A warm <span class="italic">embrace</span> by the bay</div>
-        </div>
-      </div>
-      <div class="carousel-slide">
-        <img src="https://static.wixstatic.com/media/05f177_14f4824b98054ff5b183519ab49ed7a4~mv2_d_4087_2728_s_4_2.jpg/v1/fill/w_1920,h_1280,q_90,enc_avif,quality_auto/Trio%20salmon_JPG.jpg" alt="Trio of salmon">
-        <div class="carousel-overlay"></div>
-        <div class="carousel-caption">
-          <div class="carousel-caption-label">From the Kitchen</div>
-          <div class="carousel-caption-title">Trio of <span class="italic">salmon</span>, locally sourced</div>
-        </div>
-      </div>
-      <div class="carousel-slide">
-        <img src="https://static.wixstatic.com/media/05f177_b45384f62821488f93b7a34edcd5667f~mv2_d_5459_3644_s_4_2.jpg/v1/fill/w_1920,h_1280,q_90,enc_avif,quality_auto/Panna%20cotta_JPG.jpg" alt="Panna cotta">
-        <div class="carousel-overlay"></div>
-        <div class="carousel-caption">
-          <div class="carousel-caption-label">Sweet Endings</div>
-          <div class="carousel-caption-title">Panna <span class="italic">cotta</span> — silky, classic</div>
-        </div>
-      </div>
-      <div class="carousel-slide">
-        <img src="https://static.wixstatic.com/media/05f177_746831b1aa9d4c8fa5d6e2f0b28535f1~mv2_d_6016_4016_s_4_2.jpg/v1/fill/w_1920,h_1280,q_90,enc_avif,quality_auto/05f177_746831b1aa9d4c8fa5d6e2f0b28535f1~mv2_d_6016_4016_s_4_2.jpg" alt="Papà Brizio ambiance">
-        <div class="carousel-overlay"></div>
-        <div class="carousel-caption">
-          <div class="carousel-caption-label">The Vibe</div>
-          <div class="carousel-caption-title">Come for the <span class="italic">coffee</span>, stay for the atmosphere</div>
-        </div>
-      </div>
-    </div>
-    <div class="carousel-arrows">
-      <div class="carousel-arrow" id="prevArrow">‹</div>
-      <div class="carousel-arrow" id="nextArrow">›</div>
-    </div>
-    <div class="carousel-dots" id="dots"></div>
-    <div class="carousel-progress" id="progress" style="width:0"></div>
-  </div>
+  <div class="gallery-filters reveal" id="galleryFilters"></div>
+  <div class="gallery-grid reveal" id="galleryGrid"></div>
 </section>
+
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-caption">
+      <div class="gallery-item-cat" id="lightboxCat"></div>
+      <div class="gallery-item-label" id="lightboxLabel"></div>
+    </div>
+  </div>
+</div>
 
 <!-- HIGH TEA -->
 <section class="hightea" id="hightea">
@@ -1012,68 +994,187 @@
     navLinks.style.gap = '1.5rem';
   });
 
-  // Carousel
-  const track = document.getElementById('track');
-  const slides = track ? track.children : [];
-  const dotsContainer = document.getElementById('dots');
-  const progressBar = document.getElementById('progress');
-  const prevArrow = document.getElementById('prevArrow');
-  const nextArrow = document.getElementById('nextArrow');
-  let currentSlide = 0;
-  let autoTimer = null;
-  let progressTimer = null;
-  const SLIDE_DURATION = 5000;
+  // Gallery — categories derived from filenames
+  const GALLERY_CATEGORIES = {
+    all: 'All',
+    breakfast: 'Breakfast',
+    mains: 'Mains',
+    starters: 'Starters',
+    salads: 'Salads',
+    sides: 'Sides',
+    desserts: 'Desserts',
+    drinks: 'Drinks',
+    'high-tea': 'High Tea',
+    venue: 'Venue'
+  };
 
-  function buildDots() {
-    if (!dotsContainer) return;
-    dotsContainer.innerHTML = '';
-    for (let i = 0; i < slides.length; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', () => goToSlide(i));
-      dotsContainer.appendChild(dot);
-    }
+  const GALLERY_EXCLUDE = /logo|montrose-logo/;
+
+  const GALLERY_FILES = [
+    'papa-brizio-apple-pie.webp',
+    'papa-brizio-artisan-bread.webp',
+    'papa-brizio-avocado-toast-poached-eggs.webp',
+    'papa-brizio-bacon-and-egg-roll.webp',
+    'papa-brizio-baked-cheese-souffle.webp',
+    'papa-brizio-bruschetta.webp',
+    'papa-brizio-cappuccino.webp',
+    'papa-brizio-chai-latte.webp',
+    'papa-brizio-cheese-bread-bites.webp',
+    'papa-brizio-chicken-and-waffles.webp',
+    'papa-brizio-chicken-salad.webp',
+    'papa-brizio-chicken-schnitzel-sandwich.webp',
+    'papa-brizio-chicken-tenders-fries.webp',
+    'papa-brizio-chocolate-fruit-cake.webp',
+    'papa-brizio-chocolate-fruit-cake-2.webp',
+    'papa-brizio-cooked-breakfast.webp',
+    'papa-brizio-curly-fries.webp',
+    'papa-brizio-danish-pastries.webp',
+    'papa-brizio-duck-breast-plate.webp',
+    'papa-brizio-eggs-benedict.webp',
+    'papa-brizio-eggs-benedict-2.webp',
+    'papa-brizio-espresso-shot.webp',
+    'papa-brizio-fish-and-chips.webp',
+    'papa-brizio-fries.webp',
+    'papa-brizio-greek-salad.webp',
+    'papa-brizio-grilled-chicken-breast.webp',
+    'papa-brizio-hero-background.webp',
+    'papa-brizio-high-tea-desserts.webp',
+    'papa-brizio-high-tea-desserts-2.webp',
+    'papa-brizio-iced-caramel-latte.webp',
+    'papa-brizio-jalapeno-poppers.webp',
+    'papa-brizio-lipton-iced-tea.webp',
+    'papa-brizio-loaded-fries.webp',
+    'papa-brizio-loaded-potato-wedges.webp',
+    'papa-brizio-mini-quiches.webp',
+    'papa-brizio-pan-fried-dumplings.webp',
+    'papa-brizio-panna-cotta.webp',
+    'papa-brizio-pork-belly-mash.webp',
+    'papa-brizio-pork-belly-mash-2.webp',
+    'papa-brizio-prawn-avocado-salad.webp',
+    'papa-brizio-roast-beef-dinner.webp',
+    'papa-brizio-scrambled-eggs-breakfast.webp',
+    'papa-brizio-seafood-paella.webp',
+    'papa-brizio-smoked-salmon-antipasto.webp',
+    'papa-brizio-soft-drink-cans.webp',
+    'papa-brizio-swedish-meatballs.webp',
+    'papa-brizio-35.webp',
+    'papa-brizio-39.webp'
+  ];
+
+  function slugFromFile(file) {
+    return file.replace(/^papa-brizio-/, '').replace(/\.webp$/, '');
   }
 
-  function goToSlide(n) {
-    currentSlide = ((n % slides.length) + slides.length) % slides.length;
-    track.style.transform = `translateX(-${currentSlide * 100}%)`;
-    [...slides].forEach((s, i) => s.classList.toggle('active', i === currentSlide));
-    [...dotsContainer.children].forEach((d, i) => d.classList.toggle('active', i === currentSlide));
-    resetAuto();
+  function labelFromSlug(slug) {
+    if (/^\d+$/.test(slug) || slug === 'hero-background') return 'Our Space';
+    return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   }
 
-  function nextSlide() { goToSlide(currentSlide + 1); }
-  function prevSlide() { goToSlide(currentSlide - 1); }
-
-  function resetAuto() {
-    clearInterval(autoTimer);
-    clearInterval(progressTimer);
-    progressBar.style.width = '0%';
-    let elapsed = 0;
-    progressTimer = setInterval(() => {
-      elapsed += 50;
-      progressBar.style.width = (elapsed / SLIDE_DURATION * 100) + '%';
-    }, 50);
-    autoTimer = setInterval(nextSlide, SLIDE_DURATION);
+  function categorizeFromSlug(slug) {
+    const base = slug.replace(/-\d+$/, '');
+    if (/^(hero-background|\d+)$/.test(base)) return 'venue';
+    if (/breakfast|eggs-benedict|scrambled-eggs|bacon-and-egg|avocado-toast|chicken-and-waffles|cooked-breakfast/.test(base)) return 'breakfast';
+    if (/cappuccino|chai-latte|espresso|latte|iced-tea|soft-drink/.test(base)) return 'drinks';
+    if (/high-tea|mini-quiches/.test(base)) return 'high-tea';
+    if (/apple-pie|panna-cotta|chocolate-fruit-cake|danish-pastries|baked-cheese-souffle|souffle/.test(base)) return 'desserts';
+    if (/salad/.test(base)) return 'salads';
+    if (/bruschetta|dumplings|antipasto/.test(base)) return 'starters';
+    if (/^(fries|curly-fries|loaded-fries|loaded-potato-wedges|jalapeno-poppers|cheese-bread-bites|artisan-bread)$/.test(base)) return 'sides';
+    return 'mains';
   }
 
-  if (track && slides.length > 0) {
-    buildDots();
-    prevArrow?.addEventListener('click', prevSlide);
-    nextArrow?.addEventListener('click', nextSlide);
-    // Pause on hover
-    const carousel = document.getElementById('carousel');
-    carousel?.addEventListener('mouseenter', () => { clearInterval(autoTimer); clearInterval(progressTimer); });
-    carousel?.addEventListener('mouseleave', resetAuto);
-    // Touch swipe
-    let touchStartX = 0;
-    carousel?.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
-    carousel?.addEventListener('touchend', e => {
-      const diff = touchStartX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 40) { diff > 0 ? nextSlide() : prevSlide(); }
+  function buildGalleryData() {
+    return GALLERY_FILES
+      .filter(f => !GALLERY_EXCLUDE.test(f))
+      .map(file => {
+        const slug = slugFromFile(file);
+        const category = categorizeFromSlug(slug);
+        return {
+          file,
+          slug,
+          category,
+          label: labelFromSlug(slug),
+          src: 'assets/images/' + file
+        };
+      });
+  }
+
+  const galleryData = buildGalleryData();
+  const galleryFilters = document.getElementById('galleryFilters');
+  const galleryGrid = document.getElementById('galleryGrid');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCat = document.getElementById('lightboxCat');
+  const lightboxLabel = document.getElementById('lightboxLabel');
+  const lightboxClose = document.getElementById('lightboxClose');
+  let activeFilter = 'all';
+
+  function renderGalleryFilters() {
+    if (!galleryFilters) return;
+    const usedCategories = new Set(galleryData.map(i => i.category));
+    Object.entries(GALLERY_CATEGORIES).forEach(([key, label]) => {
+      if (key !== 'all' && !usedCategories.has(key)) return;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'gallery-filter' + (key === 'all' ? ' active' : '');
+      btn.textContent = label;
+      btn.dataset.filter = key;
+      btn.addEventListener('click', () => setGalleryFilter(key));
+      galleryFilters.appendChild(btn);
     });
-    resetAuto();
+  }
+
+  function renderGalleryGrid() {
+    if (!galleryGrid) return;
+    galleryGrid.innerHTML = '';
+    galleryData.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'gallery-item' + (activeFilter !== 'all' && item.category !== activeFilter ? ' hidden' : '');
+      el.dataset.category = item.category;
+      el.innerHTML =
+        '<img src="' + item.src + '" alt="' + item.label + '" loading="lazy">' +
+        '<div class="gallery-item-overlay">' +
+          '<div class="gallery-item-cat">' + GALLERY_CATEGORIES[item.category] + '</div>' +
+          '<div class="gallery-item-label">' + item.label + '</div>' +
+        '</div>';
+      el.addEventListener('click', () => openLightbox(item));
+      galleryGrid.appendChild(el);
+    });
+  }
+
+  function setGalleryFilter(filter) {
+    activeFilter = filter;
+    galleryFilters.querySelectorAll('.gallery-filter').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === filter);
+    });
+    galleryGrid.querySelectorAll('.gallery-item').forEach(el => {
+      const show = filter === 'all' || el.dataset.category === filter;
+      el.classList.toggle('hidden', !show);
+    });
+  }
+
+  function openLightbox(item) {
+    lightboxImg.src = item.src;
+    lightboxImg.alt = item.label;
+    lightboxCat.textContent = GALLERY_CATEGORIES[item.category];
+    lightboxLabel.textContent = item.label;
+    lightbox.classList.add('open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  if (galleryGrid && galleryData.length) {
+    renderGalleryFilters();
+    renderGalleryGrid();
+    lightboxClose?.addEventListener('click', closeLightbox);
+    lightbox?.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
   }
 
   // High Tea booking form
