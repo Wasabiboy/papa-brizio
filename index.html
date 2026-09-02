@@ -44,23 +44,21 @@
   }
   .loader.done { opacity: 0; visibility: hidden; }
   .loader-ring {
-    width: 220px; height: 220px;
+    width: 260px; height: 260px;
     border: 1px solid var(--border);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     position: relative;
-    overflow: hidden;
   }
   .loader-ring::before {
-    content: ''; position: absolute; inset: -1px;
+    content: ''; position: absolute; inset: -2px;
     border: 2px solid transparent;
     border-top-color: var(--gold);
     border-radius: 50%;
     animation: spin 1.5s linear infinite;
   }
   .loader-logo {
-    width: 180px; height: 180px;
-    border-radius: 50%;
+    width: 210px; height: 210px;
     object-fit: contain;
     animation: logoFade 1s ease 0.3s both;
   }
@@ -85,13 +83,12 @@
     text-decoration: none;
   }
   .nav-logo img {
-    width: 72px; height: 72px;
-    border-radius: 50%;
+    width: auto; height: 56px;
     object-fit: contain;
     flex-shrink: 0;
     transition: transform 0.3s ease;
   }
-  .nav-logo:hover img { transform: rotate(5deg) scale(1.05); }
+  .nav-logo:hover img { transform: scale(1.03); }
   .nav-logo-text {
     font-family: var(--serif);
     font-size: 1.2rem;
@@ -538,8 +535,7 @@
     margin-bottom: 1rem;
   }
   .footer-logo img {
-    width: 96px; height: 96px;
-    border-radius: 50%;
+    width: 180px; height: auto;
     object-fit: contain;
   }
   .footer-logo-text {
@@ -576,6 +572,7 @@
   }
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
+    .nav-logo img { height: 44px; }
     .nav-links, .nav-cta { display: none; }
     .nav-mobile { display: flex; }
     section { padding: 5rem 1.5rem; }
@@ -599,15 +596,14 @@
 <!-- LOADER -->
 <div class="loader" id="loader">
   <div class="loader-ring">
-    <img src="assets/logo.png" class="loader-logo" alt="Papà Brizio">
+    <img src="assets/Papa%20Brizio%20Logo%20Color.png" class="loader-logo" alt="Papà Brizio">
   </div>
 </div>
 
 <!-- NAV -->
 <nav id="nav">
   <a href="#" class="nav-logo">
-    <img src="assets/logo.png" alt="Papà Brizio">
-    <div class="nav-logo-text">Papà Brizio<span>Ristorante · Espresso</span></div>
+    <img src="assets/Papa%20Brizio%20Logo%20White.png" alt="Papà Brizio — Ristorante · Espresso Lounge">
   </a>
   <ul class="nav-links">
     <li><a href="#story">Our Story</a></li>
@@ -927,10 +923,8 @@
     <div class="footer-grid">
       <div>
         <div class="footer-logo">
-          <img src="assets/logo.png" alt="Papà Brizio">
-          <div class="footer-logo-text">Papà <span>Brizio</span></div>
+          <img src="assets/Papa%20Brizio%20Logo%20Color.png" alt="Papà Brizio — Ristorante · Espresso Lounge">
         </div>
-        <p class="footer-tag">Ristorante · Espresso Lounge</p>
         <p style="margin-top:1rem;font-size:0.85rem;color:var(--cream-dim);max-width:300px;">Come for the coffee. Stay for the atmosphere. Return for the experience.</p>
       </div>
       <div class="footer-col">
