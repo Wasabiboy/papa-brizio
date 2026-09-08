@@ -131,8 +131,21 @@
     background: var(--gold);
     color: var(--bg);
   }
-  .nav-mobile { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
-  .nav-mobile span { width: 24px; height: 1px; background: var(--cream); transition: 0.3s; }
+  .nav-mobile {
+    display: none; cursor: pointer;
+    flex-direction: column; justify-content: center; align-items: center; gap: 6px;
+    width: 48px; height: 48px;
+    border: 1px solid var(--gold);
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+  .nav-mobile span {
+    display: block; width: 22px; height: 3px;
+    background: var(--bg); border-radius: 1px; transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .nav-mobile.open span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+  .nav-mobile.open span:nth-child(2) { opacity: 0; }
+  .nav-mobile.open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 
   /* ===== HERO ===== */
   .hero {
@@ -375,6 +388,97 @@
   .hightea-form label { font-size: 0.9rem; color: var(--cream-dim); margin-bottom: 0.3rem; display: block; }
   .hightea-form .btn-primary { justify-self: start; cursor: pointer; border: none; font-family: var(--sans); }
   .hightea-form-note { font-size: 0.85rem; color: var(--cream-dim); font-style: italic; }
+
+  /* ===== RESERVATIONS ===== */
+  .reservations { background: var(--bg); }
+  .reservations-lead {
+    text-align: center; max-width: 640px; margin: 0 auto 3rem;
+    font-size: 1.15rem; color: var(--cream-dim); line-height: 1.7;
+  }
+  .reservations-panel {
+    max-width: 920px; margin: 0 auto;
+    border: 1px solid var(--border);
+    background: rgba(20,17,15,0.55);
+    padding: 2.5rem;
+  }
+  .res-field {
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .res-field label {
+    display: block; font-family: var(--serif); font-size: 1.05rem;
+    color: var(--cream); margin-bottom: 0.6rem;
+  }
+  .res-field select, .res-field input[type=date],
+  .res-details input, .res-details textarea {
+    width: 100%; background: transparent;
+    border: 1px solid var(--border); color: var(--cream);
+    padding: 0.85rem 1rem; font-family: var(--serif); font-size: 1.1rem;
+    border-radius: 0; appearance: none;
+  }
+  .res-field select {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23c9a96e' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 1rem center;
+    padding-right: 2.5rem;
+  }
+  .res-field select:focus, .res-field input:focus,
+  .res-details input:focus, .res-details textarea:focus {
+    outline: none; border-color: var(--gold);
+  }
+  .res-slots-label {
+    font-family: var(--serif); font-size: 1.05rem; color: var(--cream);
+    margin: 1.6rem 0 1rem;
+  }
+  .res-slots {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.65rem;
+  }
+  .res-slot {
+    border: 1px solid rgba(255,255,255,0.35);
+    background: transparent; color: var(--cream);
+    font-family: var(--serif); font-size: 1rem;
+    padding: 0.7rem 0.4rem; cursor: pointer; transition: all 0.2s;
+  }
+  .res-slot:hover { border-color: var(--gold); color: var(--gold); }
+  .res-slot.active { background: #5a3d2a; border-color: #5a3d2a; color: var(--cream); }
+  .res-slot:disabled { opacity: 0.35; cursor: not-allowed; }
+  .res-actions { display: flex; justify-content: flex-end; margin-top: 1.75rem; }
+  .res-actions .btn-primary, .res-details .btn-primary {
+    cursor: pointer; border: none; font-family: var(--serif);
+    font-size: 1.05rem; letter-spacing: 0.04em; text-transform: none;
+    padding: 0.9rem 1.8rem;
+  }
+  .res-note, .res-closed {
+    font-size: 0.9rem; color: var(--cream-dim); margin-top: 1rem; font-style: italic;
+  }
+  .res-closed { color: var(--gold); }
+  .res-step { display: none; }
+  .res-step.active { display: block; }
+  .res-complete {
+    display: grid; grid-template-columns: 1.4fr 0.8fr; gap: 2.5rem; align-items: start;
+  }
+  .res-details h3, .res-summary h3 {
+    font-family: var(--serif); font-size: 1.35rem; font-weight: 400;
+    color: var(--cream); margin-bottom: 1.25rem;
+  }
+  .res-details-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .res-details label {
+    display: block; font-family: var(--serif); font-size: 0.95rem;
+    color: var(--cream); margin-bottom: 0.4rem;
+  }
+  .res-details textarea { min-height: 110px; resize: vertical; }
+  .res-details .btn-primary { width: 100%; margin-top: 0.5rem; }
+  .res-summary {
+    border: 1px solid var(--border); padding: 1.5rem 1.6rem;
+    background: rgba(10,9,8,0.4);
+  }
+  .res-summary p { font-family: var(--serif); font-size: 1.15rem; color: var(--cream); margin-bottom: 0.55rem; }
+  .res-change {
+    display: inline-block; margin-top: 1rem; padding-top: 1rem;
+    border-top: 1px solid var(--border); color: var(--cream);
+    font-family: var(--serif); text-decoration: underline; cursor: pointer;
+    background: none; border-left: 0; border-right: 0; border-bottom: 0;
+    font-size: 1rem;
+  }
+  .res-change:hover { color: var(--gold); }
   .gallery { background: var(--bg); overflow: hidden; padding: 6rem 3rem; }
   .gallery-header { text-align: center; margin-bottom: 3rem; }
   .gallery-filters {
@@ -573,8 +677,32 @@
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
     .nav-logo img { height: 44px; }
-    .nav-links, .nav-cta { display: none; }
-    .nav-mobile { display: flex; }
+    .nav-cta { display: none; }
+    .nav-mobile { display: flex; position: relative; z-index: 110; }
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.75rem;
+      position: fixed;
+      inset: 0;
+      z-index: 105;
+      background: rgba(10, 9, 8, 0.96);
+      backdrop-filter: blur(16px);
+      padding: 6rem 2rem 2.5rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+    }
+    .nav-links.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition: opacity 0.4s ease, visibility 0s linear 0s;
+    }
+    .nav-links a { font-size: 1.15rem; }
     section { padding: 5rem 1.5rem; }
     .story-grid, .menu-grid, .visit-grid { grid-template-columns: 1fr; gap: 2rem; }
     .visit-map { min-height: 280px; }
@@ -582,6 +710,9 @@
     .exp-grid { grid-template-columns: 1fr; }
     .hightea-grid { grid-template-columns: 1fr; gap: 2.5rem; }
     .hightea-form-row { grid-template-columns: 1fr; }
+    .res-slots { grid-template-columns: repeat(3, 1fr); }
+    .res-complete, .res-details-row { grid-template-columns: 1fr; }
+    .reservations-panel { padding: 1.5rem; }
     .gallery { padding: 5rem 1.5rem; }
     .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
     .gallery-filters { gap: 0.4rem; }
@@ -610,11 +741,12 @@
     <li><a href="#experience">Experience</a></li>
     <li><a href="#menu">Menu</a></li>
     <li><a href="#hightea">High Tea</a></li>
+    <li><a href="#reservations">Reservations</a></li>
     <li><a href="#gallery">Gallery</a></li>
     <li><a href="#visit">Visit</a></li>
   </ul>
   <a href="https://www.montrose.org.nz/all-products" target="_blank" class="nav-cta">Order Online</a>
-  <div class="nav-mobile" id="navMobile">
+  <div class="nav-mobile" id="navMobile" role="button" aria-label="Open menu" aria-expanded="false" tabindex="0">
     <span></span><span></span><span></span>
   </div>
 </nav>
@@ -629,7 +761,7 @@
     <p class="hero-sub">Where flavor, comfort & style meet in Mairangi Bay</p>
     <div class="hero-buttons">
       <a href="https://www.montrose.org.nz/all-products" target="_blank" class="btn-primary">Order Online</a>
-      <a href="#visit" class="btn-outline">Visit Us</a>
+      <a href="#reservations" class="btn-outline">Book a Table</a>
     </div>
   </div>
   <div class="hero-scroll">Scroll</div>
@@ -883,6 +1015,96 @@
   </div>
 </section>
 
+<!-- RESERVATIONS -->
+<section class="reservations" id="reservations">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-label">Book a Table</div>
+      <h2 class="section-title">Request a <span class="italic">reservation</span></h2>
+      <p class="reservations-lead">Select your details and we’ll try to get the best seats for you.</p>
+    </div>
+
+    <div class="reservations-panel reveal">
+      <div class="res-step active" id="resStep1">
+        <div class="res-field">
+          <label for="resParty">Party size</label>
+          <select id="resParty">
+            <option value="1">1 guest</option>
+            <option value="2" selected>2 guests</option>
+            <option value="3">3 guests</option>
+            <option value="4">4 guests</option>
+            <option value="5">5 guests</option>
+            <option value="6">6 guests</option>
+            <option value="7">7 guests</option>
+            <option value="8">8 guests</option>
+            <option value="9">9 guests</option>
+            <option value="10">10 guests</option>
+            <option value="11">11 guests</option>
+            <option value="12">12 guests</option>
+            <option value="13+">13+ guests</option>
+          </select>
+        </div>
+        <div class="res-field">
+          <label for="resDate">Date</label>
+          <input type="date" id="resDate">
+        </div>
+        <div class="res-field">
+          <label for="resTimeSelect">Time</label>
+          <select id="resTimeSelect"></select>
+        </div>
+        <p class="res-closed" id="resClosed" hidden>We’re closed on Mondays. Please choose another day, or call 09 478 9610.</p>
+        <p class="res-slots-label" id="resSlotsLabel">Please choose an available time slot:</p>
+        <div class="res-slots" id="resSlots"></div>
+        <p class="res-note" id="resLargeNote" hidden>For groups of 13 or more, we recommend calling 09 478 9610 so we can arrange the best seating.</p>
+        <div class="res-actions">
+          <button type="button" class="btn-primary" id="resRequest">Request Now</button>
+        </div>
+      </div>
+
+      <div class="res-step" id="resStep2">
+        <h2 class="section-title" style="font-size:clamp(2rem,4vw,2.8rem);margin-bottom:1.5rem;">Complete your request</h2>
+        <div class="res-complete">
+          <form class="res-details" id="resDetailsForm">
+            <h3>Please fill in your details:</h3>
+            <div class="res-details-row">
+              <div>
+                <label for="resFirst">First name *</label>
+                <input type="text" id="resFirst" required>
+              </div>
+              <div>
+                <label for="resLast">Last name *</label>
+                <input type="text" id="resLast" required>
+              </div>
+            </div>
+            <div class="res-details-row">
+              <div>
+                <label for="resPhone">Phone number *</label>
+                <input type="tel" id="resPhone" required>
+              </div>
+              <div>
+                <label for="resEmail">Email address *</label>
+                <input type="email" id="resEmail" required>
+              </div>
+            </div>
+            <div style="margin-bottom:1rem;">
+              <label for="resSpecial">Special request</label>
+              <textarea id="resSpecial" placeholder="Allergies, occasion, high chair, outdoor seating…"></textarea>
+            </div>
+            <button type="submit" class="btn-primary">Complete Request</button>
+          </form>
+          <aside class="res-summary">
+            <h3>Request details:</h3>
+            <p id="resSummaryWhen"></p>
+            <p id="resSummaryParty"></p>
+            <p>1 Montrose Terrace</p>
+            <button type="button" class="res-change" id="resChange">Change Selection</button>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- VISIT -->
 <section class="visit" id="visit">
   <div class="visit-bg"></div>
@@ -933,6 +1155,7 @@
         <a href="#experience">Experience</a>
         <a href="#menu">Menu</a>
         <a href="#hightea">High Tea</a>
+        <a href="#reservations">Reservations</a>
         <a href="#gallery">Gallery</a>
         <a href="#visit">Visit</a>
       </div>
@@ -976,16 +1199,29 @@
   // Mobile nav toggle
   const navMobile = document.getElementById('navMobile');
   const navLinks = document.querySelector('.nav-links');
+
+  function setMobileMenu(open) {
+    navLinks?.classList.toggle('open', open);
+    navMobile?.classList.toggle('open', open);
+    navMobile?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    navMobile?.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
   navMobile?.addEventListener('click', () => {
-    navLinks.style.display = navLinks.style.display === 'flex' ? '' : 'flex';
-    navLinks.style.flexDirection = 'column';
-    navLinks.style.position = 'absolute';
-    navLinks.style.top = '100%';
-    navLinks.style.left = '0';
-    navLinks.style.right = '0';
-    navLinks.style.background = 'rgba(10,9,8,0.95)';
-    navLinks.style.padding = '2rem';
-    navLinks.style.gap = '1.5rem';
+    setMobileMenu(!navLinks.classList.contains('open'));
+  });
+  navMobile?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setMobileMenu(!navLinks.classList.contains('open'));
+    }
+  });
+  navLinks?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => setMobileMenu(false));
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setMobileMenu(false);
   });
 
   // Gallery — categories derived from filenames
@@ -1169,6 +1405,159 @@
     lightboxClose?.addEventListener('click', closeLightbox);
     lightbox?.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+  }
+
+  // Table reservations — same 2-step flow as montrose.org.nz/reservations
+  const resParty = document.getElementById('resParty');
+  const resDate = document.getElementById('resDate');
+  const resTimeSelect = document.getElementById('resTimeSelect');
+  const resSlots = document.getElementById('resSlots');
+  const resClosed = document.getElementById('resClosed');
+  const resSlotsLabel = document.getElementById('resSlotsLabel');
+  const resLargeNote = document.getElementById('resLargeNote');
+  const resRequest = document.getElementById('resRequest');
+  const resStep1 = document.getElementById('resStep1');
+  const resStep2 = document.getElementById('resStep2');
+  const resDetailsForm = document.getElementById('resDetailsForm');
+  const resChange = document.getElementById('resChange');
+  let selectedTime = '';
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function formatTime(mins) {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return pad(h) + ':' + pad(m);
+  }
+
+  function formatTimePretty(hhmm) {
+    const [h, m] = hhmm.split(':').map(Number);
+    const suffix = h >= 12 ? 'pm' : 'am';
+    const hr = ((h + 11) % 12) + 1;
+    return hr + ':' + pad(m) + ' ' + suffix;
+  }
+
+  function formatDatePretty(iso) {
+    const d = new Date(iso + 'T12:00:00');
+    return d.toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function hoursForDate(iso) {
+    const day = new Date(iso + 'T12:00:00').getDay(); // 0 Sun … 6 Sat
+    if (day === 1) return null; // Monday closed
+    if (day === 0 || day === 6) return { start: 9 * 60, end: 20 * 60 + 30 };
+    return { start: 10 * 60, end: 20 * 60 + 30 };
+  }
+
+  function slotsForDate(iso) {
+    const hours = hoursForDate(iso);
+    if (!hours) return [];
+    const out = [];
+    for (let t = hours.start; t <= hours.end; t += 15) out.push(formatTime(t));
+    return out;
+  }
+
+  function nextOpenDate(from) {
+    const d = new Date(from);
+    for (let i = 0; i < 14; i++) {
+      const iso = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      if (hoursForDate(iso)) return iso;
+      d.setDate(d.getDate() + 1);
+    }
+    return from;
+  }
+
+  function renderReservationSlots() {
+    if (!resDate || !resSlots) return;
+    const iso = resDate.value;
+    const slots = slotsForDate(iso);
+    const closed = slots.length === 0;
+    resClosed.hidden = !closed;
+    resSlotsLabel.hidden = closed;
+    resSlots.hidden = closed;
+    resTimeSelect.disabled = closed;
+    resRequest.disabled = closed;
+    resLargeNote.hidden = resParty.value !== '13+';
+
+    resTimeSelect.innerHTML = '';
+    resSlots.innerHTML = '';
+    if (closed) {
+      selectedTime = '';
+      return;
+    }
+    if (!slots.includes(selectedTime)) selectedTime = slots[0];
+
+    slots.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t;
+      if (t === selectedTime) opt.selected = true;
+      resTimeSelect.appendChild(opt);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'res-slot' + (t === selectedTime ? ' active' : '');
+      btn.textContent = t;
+      btn.addEventListener('click', () => {
+        selectedTime = t;
+        resTimeSelect.value = t;
+        resSlots.querySelectorAll('.res-slot').forEach(el => el.classList.toggle('active', el.textContent === t));
+      });
+      resSlots.appendChild(btn);
+    });
+  }
+
+  if (resDate) {
+    const today = new Date();
+    const todayIso = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
+    resDate.min = todayIso;
+    resDate.value = nextOpenDate(todayIso);
+    renderReservationSlots();
+    resDate.addEventListener('change', () => {
+      if (!hoursForDate(resDate.value)) {
+        resDate.value = nextOpenDate(resDate.value);
+      }
+      renderReservationSlots();
+    });
+    resParty.addEventListener('change', renderReservationSlots);
+    resTimeSelect.addEventListener('change', () => {
+      selectedTime = resTimeSelect.value;
+      resSlots.querySelectorAll('.res-slot').forEach(el => el.classList.toggle('active', el.textContent === selectedTime));
+    });
+    resRequest.addEventListener('click', () => {
+      if (!resDate.value || !selectedTime) return;
+      const partyLabel = resParty.options[resParty.selectedIndex].text;
+      document.getElementById('resSummaryWhen').textContent = formatDatePretty(resDate.value) + ', ' + formatTimePretty(selectedTime);
+      document.getElementById('resSummaryParty').textContent = partyLabel;
+      resStep1.classList.remove('active');
+      resStep2.classList.add('active');
+      resStep2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    resChange.addEventListener('click', () => {
+      resStep2.classList.remove('active');
+      resStep1.classList.add('active');
+    });
+    resDetailsForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const first = document.getElementById('resFirst').value.trim();
+      const last = document.getElementById('resLast').value.trim();
+      const phone = document.getElementById('resPhone').value.trim();
+      const email = document.getElementById('resEmail').value.trim();
+      const special = document.getElementById('resSpecial').value.trim();
+      const partyLabel = resParty.options[resParty.selectedIndex].text;
+      const subject = encodeURIComponent('Table reservation — ' + first + ' ' + last);
+      const body = encodeURIComponent(
+        'First name: ' + first + '\\n' +
+        'Last name: ' + last + '\\n' +
+        'Phone: ' + phone + '\\n' +
+        'Email: ' + email + '\\n' +
+        'Party size: ' + partyLabel + '\\n' +
+        'Date: ' + resDate.value + '\\n' +
+        'Time: ' + selectedTime + '\\n' +
+        'Special request: ' + (special || 'None')
+      );
+      window.location.href = 'mailto:montrosecafe@xtra.co.nz?subject=' + subject + '&body=' + body;
+    });
   }
 
   // High Tea booking form
