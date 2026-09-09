@@ -200,7 +200,7 @@
   .btn-primary {
     padding: 1rem 2.5rem;
     background: var(--gold);
-    color: var(--bg);
+    color: #0a0908;
     font-size: 0.72rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -320,6 +320,12 @@
   }
 
   /* ===== MENU PREVIEW ===== */
+  .hours-note {
+    max-width: 720px; margin: 0 auto 1.5rem; text-align: center;
+    font-size: 1.05rem; color: var(--cream-dim); line-height: 1.7;
+  }
+  .hours-note strong { color: var(--gold); font-weight: 500; }
+  .hours-note .fine { font-size: 0.85rem; margin-top: 0.75rem; display: block; }
   .menu-preview { background: var(--bg-warm); }
   .menu-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-top: 4rem;
@@ -794,7 +800,7 @@
     <li><a href="#gallery">Gallery</a></li>
     <li><a href="#visit">Visit</a></li>
   </ul>
-  <a href="https://www.montrose.org.nz/all-products" target="_blank" class="nav-cta">Order Online</a>
+  <a href="#reservations" class="nav-cta">Book a Table</a>
   <div class="nav-mobile" id="navMobile" role="button" aria-label="Open menu" aria-expanded="false" tabindex="0">
     <span></span><span></span><span></span>
   </div>
@@ -808,8 +814,9 @@
     <div class="hero-tag">Ristorante · Espresso Lounge</div>
     <h1>Papà <span class="accent">Brizio</span></h1>
     <p class="hero-sub">Where flavor, comfort & style meet in Mairangi Bay</p>
+    <p class="hero-sub" style="margin-top:0.4rem;font-size:1.05rem;">Open Wednesday – Sunday · 8am – 8pm</p>
     <div class="hero-buttons">
-      <a href="https://www.montrose.org.nz/all-products" target="_blank" class="btn-primary">Order Online</a>
+      <a href="menu.html" class="btn-primary">View Menu</a>
       <a href="#reservations" class="btn-outline">Book a Table</a>
     </div>
   </div>
@@ -863,7 +870,7 @@
         <img src="https://static.wixstatic.com/media/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg/v1/fill/w_600,h_800,q_90,enc_avif,quality_auto/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg" alt="Evening at Papà Brizio">
         <div class="exp-overlay">
           <div class="exp-title">Evening</div>
-          <div class="exp-time">Evening at Papà Brizio · 5pm — Late</div>
+          <div class="exp-time">Evening at Papà Brizio · 5pm — 8pm</div>
           <div class="exp-desc">Curated wines, signature cocktails, pizza & pasta</div>
         </div>
       </div>
@@ -877,6 +884,11 @@
     <div class="reveal" style="text-align:center;margin-bottom:1rem;">
       <div class="section-label">A Taste</div>
       <h2 class="section-title">From our <span class="italic">kitchen</span></h2>
+      <p class="hours-note">
+        <strong>Open Wednesday – Sunday · 8am – 8pm</strong><br>
+        Place an order anytime — note the time you want to collect. Pay in-store or online.
+        <span class="fine">This is our online-only menu. Please see our <a href="https://www.google.com/maps/search/?api=1&amp;query=Montrose+Cafe+Bistro+Bar+Mairangi+Bay" target="_blank" style="color:var(--gold);">Google listing photos</a> for the menu in store.</span>
+      </p>
     </div>
     <div class="menu-grid">
       <div class="menu-col reveal">
@@ -943,8 +955,7 @@
       </div>
     </div>
     <div class="menu-buttons reveal" style="text-align:center;margin-top:3rem;display:flex;flex-direction:column;gap:1rem;align-items:center;">
-      <a href="https://sleek-quail-6ftr.here.now/menu.html" class="btn-outline" style="display:block;width:100%;max-width:280px;">View Full Menu</a>
-      <a href="https://www.montrose.org.nz/all-products" target="_blank" class="btn-primary" style="display:block;width:100%;max-width:280px;">Order Online</a>
+      <a href="menu.html" class="btn-outline" style="display:block;width:100%;max-width:280px;">View Full Menu</a>
     </div>
   </div>
 </section>
@@ -997,7 +1008,7 @@
         </div>
         <div class="hightea-details">
           <p><strong>What's included:</strong> 3 hot savouries, selection of 3 sandwiches, 5 yummy desserts</p>
-          <p><strong>When:</strong> 2pm – 5pm, Tuesday – Sunday</p>
+          <p><strong>When:</strong> 2pm – 5pm, Wednesday – Sunday</p>
           <p><strong>Book by:</strong> Reservations must be made before 10am on the day</p>
           <p><strong>Minimum:</strong> 2 people — groups welcome</p>
           <p><strong>Deposit:</strong> $70 for all bookings<br>
@@ -1174,8 +1185,9 @@
       </div>
       <div class="visit-card reveal reveal-delay-1">
         <h3>Hours</h3>
-        <p>Tuesday · 10am – 9pm</p>
-        <p>Wednesday – Sunday · 10am – 10pm</p>
+        <p>Wednesday – Sunday · 8am – 8pm</p>
+        <p>Monday &amp; Tuesday · Closed</p>
+        <p style="margin-top:1rem;">Place an order anytime — note the time you want to collect. Pay in-store or online.</p>
         <p style="margin-top:1rem;color:var(--gold);">Fully Licensed Bar</p>
         <p><abbr title="Bring Your Own Wine" style="text-decoration:underline dotted;text-underline-offset:3px;cursor:help;color:var(--gold);">BYOW</abbr> Wednesday & Thursday</p>
         <p style="font-size:0.75rem;margin-top:0.3rem;">Corkage applies</p>
@@ -1213,12 +1225,12 @@
       <div class="footer-col">
         <h4>Connect</h4>
         <a href="tel:094789610">📞 09 478 9610</a>
-        <a href="https://www.montrose.org.nz/all-products" target="_blank">Order Online</a>
+        <p style="font-size:0.85rem;color:var(--cream-dim);margin-top:0.6rem;line-height:1.6;">Open Wednesday – Sunday<br>8am – 8pm</p>
         <a href="https://www.montrose.org.nz/" target="_blank">Montrose Cafe Bistro Bar</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Papà Brizio · 1 Montrose Terrace, Mairangi Bay</span>
+      <span>© 2026 Papà Brizio · 1 Montrose Terrace, Mairangi Bay · Open Wednesday – Sunday, 8am – 8pm</span>
       <span>Crafted with intention.</span>
     </div>
   </div>
@@ -1585,9 +1597,8 @@
       if (start == null || end == null) return null;
       return { start, end };
     }
-    if (day === 1) return null;
-    if (day === 0 || day === 6) return { start: 9 * 60, end: 20 * 60 + 30 };
-    return { start: 10 * 60, end: 20 * 60 + 30 };
+    if (day === 1 || day === 2) return null;
+    return { start: 8 * 60, end: 20 * 60 };
   }
 
   function slotsForDate(iso) {

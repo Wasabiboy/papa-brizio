@@ -20,13 +20,13 @@ export const DEFAULT_SETTINGS: VenueSettings = {
   slotMinutes: 15,
   closedDates: [],
   hours: [
-    { weekday: 0, label: "Sunday", closed: false, open: "09:00", lastSlot: "20:30" },
+    { weekday: 0, label: "Sunday", closed: false, open: "08:00", lastSlot: "20:00" },
     { weekday: 1, label: "Monday", closed: true, open: null, lastSlot: null },
-    { weekday: 2, label: "Tuesday", closed: false, open: "10:00", lastSlot: "20:30" },
-    { weekday: 3, label: "Wednesday", closed: false, open: "10:00", lastSlot: "20:30" },
-    { weekday: 4, label: "Thursday", closed: false, open: "10:00", lastSlot: "20:30" },
-    { weekday: 5, label: "Friday", closed: false, open: "10:00", lastSlot: "20:30" },
-    { weekday: 6, label: "Saturday", closed: false, open: "09:00", lastSlot: "20:30" },
+    { weekday: 2, label: "Tuesday", closed: true, open: null, lastSlot: null },
+    { weekday: 3, label: "Wednesday", closed: false, open: "08:00", lastSlot: "20:00" },
+    { weekday: 4, label: "Thursday", closed: false, open: "08:00", lastSlot: "20:00" },
+    { weekday: 5, label: "Friday", closed: false, open: "08:00", lastSlot: "20:00" },
+    { weekday: 6, label: "Saturday", closed: false, open: "08:00", lastSlot: "20:00" },
   ],
 };
 

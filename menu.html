@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Menu — Papà Brizio | Ristorante & Espresso Lounge</title>
-<meta name="description" content="Full menu at Papà Brizio — coffee, breakfast, lunch, dinner, desserts & drinks. Order online for pickup.">
+<meta name="description" content="Online menu at Papà Brizio — open Wednesday to Sunday, 8am to 8pm. Coffee, breakfast, lunch, dinner, desserts and drinks in Mairangi Bay.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -46,7 +46,9 @@
   .section-label { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
   .section-title { font-family: var(--serif); font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 400; line-height: 1.05; margin-bottom: 1rem; }
   .section-title .italic { font-style: italic; color: var(--gold); }
-  .menu-info { max-width: 600px; margin: 0 auto; font-size: 0.85rem; color: var(--cream-dim); line-height: 1.8; }
+  .menu-info { max-width: 720px; margin: 0 auto; font-size: 0.95rem; color: var(--cream-dim); line-height: 1.8; }
+  .menu-info strong { color: var(--gold); font-weight: 500; }
+  .menu-info a, .text-link { color: var(--gold); text-decoration: underline; }
   .dietary-key { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 1.5rem; font-size: 0.7rem; color: var(--cream-dim); }
   .dietary-key span { display: flex; align-items: center; gap: 0.3rem; }
   .dietary-key code { color: var(--gold); font-family: var(--sans); font-size: 0.65rem; }
@@ -70,8 +72,14 @@
   .menu-item-note { font-size: 0.7rem; color: var(--cream-dim); margin-top: 0.2rem; font-style: italic; }
 
   .order-banner { text-align: center; padding: 4rem 3rem; background: var(--bg); }
-  .order-banner a { display: inline-block; padding: 1rem 2.5rem; background: var(--gold); color: var(--bg); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; font-weight: 500; transition: all 0.3s; }
-  .order-banner a:hover { background: var(--gold-bright); transform: translateY(-2px); }
+  .order-banner a.text-link { color: var(--gold); text-decoration: underline; }
+  .order-banner .btn-banner {
+    display: inline-block; padding: 1rem 2.5rem; margin-top: 0.5rem;
+    background: var(--gold); color: #0a0908;
+    font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+    text-decoration: none; font-weight: 600; transition: all 0.3s;
+  }
+  .order-banner .btn-banner:hover { background: var(--gold-bright); color: #0a0908; transform: translateY(-2px); }
 
   footer { background: var(--bg); padding: 4rem 3rem 2rem; border-top: 1px solid var(--border); text-align: center; }
   .footer-logo { display: flex; align-items: center; gap: 1rem; justify-content: center; margin-bottom: 0.5rem; }
@@ -95,27 +103,31 @@
     <img src="assets/Papa%20Brizio%20Logo%20White.png" alt="Papà Brizio — Ristorante · Espresso Lounge">
   </a>
   <ul class="nav-links">
-    <li><a href="https://sleek-quail-6ftr.here.now/#story">Story</a></li>
-    <li><a href="https://sleek-quail-6ftr.here.now/#experience">Experience</a></li>
-    <li><a href="https://sleek-quail-6ftr.here.now/#menu">Menu</a></li>
-    <li><a href="https://sleek-quail-6ftr.here.now/#gallery">Gallery</a></li>
-    <li><a href="https://sleek-quail-6ftr.here.now/#visit">Visit</a></li>
+    <li><a href="index.html#story">Story</a></li>
+    <li><a href="index.html#experience">Experience</a></li>
+    <li><a href="index.html#menu">Menu</a></li>
+    <li><a href="index.html#gallery">Gallery</a></li>
+    <li><a href="index.html#visit">Visit</a></li>
   </ul>
-  <a href="https://www.montrose.org.nz/all-products" target="_blank" class="nav-cta">Order Online</a>
+  <a href="index.html#reservations" class="nav-cta">Book a Table</a>
 </nav>
 
 <div class="menu-header">
   <div class="section-label">Our Menu</div>
   <h1 class="section-title">From <span class="italic">Papà's</span> kitchen</h1>
-  <p class="menu-info">Open Wednesday–Sunday · 8am–8pm<br>Place your order anytime, note your pickup time · Pay in-store or online</p>
+  <p class="menu-info">
+    <strong>Open Wednesday – Sunday · 8am – 8pm</strong><br>
+    Place an order anytime — note the time you want to collect. Pay in-store or online.<br>
+    This is our online-only menu. Please see our <a class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=Montrose+Cafe+Bistro+Bar+Mairangi+Bay" target="_blank">Google listing photos</a> for the menu in store.
+  </p>
   <div class="dietary-key">
     <span><code>(GF)</code> Gluten Free</span>
-    <span><code>(GF^)</code> Can be made GF</span>
+    <span><code>(GF^)</code> Can be made Gluten Free on request</span>
     <span><code>(V)</code> Vegetarian</span>
     <span><code>(VG)^</code> Vegan</span>
     <span><code>(K)</code> Keto</span>
   </div>
-  <p style="margin-top:1rem;font-size:0.7rem;color:var(--cream-dim);max-width:500px;margin-left:auto;margin-right:auto;">We use a separate gluten-free fryer and section, but cannot 100% guarantee against trace elements. Please advise us of specific dietary requirements. Menu subject to change.</p>
+  <p style="margin-top:1rem;font-size:0.8rem;color:var(--cream-dim);max-width:640px;margin-left:auto;margin-right:auto;line-height:1.7;">Please advise us if you have a specific dietary requirement. Menu subject to change.<br>We use a separate gluten-free fryer and section, but cannot 100% guarantee against trace elements.</p>
 </div>
 
 <div class="cat-nav">
@@ -403,15 +415,16 @@
 </section>
 
 <div class="order-banner">
-  <p style="margin-bottom:1.5rem;font-size:0.85rem;color:var(--cream-dim);">This is our online-only menu. For the full in-store menu, see our Google images.</p>
-  <a href="https://www.montrose.org.nz/all-products" target="_blank">Order Online Now</a>
+  <p style="margin-bottom:0.6rem;font-size:1.05rem;color:var(--cream);"><strong style="color:var(--gold);">Open Wednesday – Sunday · 8am – 8pm</strong></p>
+  <p style="margin-bottom:1.25rem;font-size:0.9rem;color:var(--cream-dim);max-width:640px;margin-left:auto;margin-right:auto;line-height:1.7;">Place an order anytime — note the time you want to collect. Pay in-store or online. This is our online-only menu; see our <a class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=Montrose+Cafe+Bistro+Bar+Mairangi+Bay" target="_blank">Google listing photos</a> for the menu in store.</p>
+  <a class="btn-banner" href="index.html#reservations">Book a Table</a>
 </div>
 
 <footer>
   <div class="footer-logo">
     <img src="assets/Papa%20Brizio%20Logo%20Color.png" alt="Papà Brizio — Ristorante · Espresso Lounge">
   </div>
-  <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--cream-dim);">1 Montrose Terrace, Mairangi Bay · 📞 09 478 9610</p>
+  <p style="margin-top:0.5rem;font-size:0.8rem;color:var(--cream-dim);">1 Montrose Terrace, Mairangi Bay · 📞 09 478 9610<br>Open Wednesday – Sunday · 8am – 8pm</p>
   <div class="footer-bottom">© 2026 Papà Brizio · Crafted with intention.</div>
 </footer>
 
