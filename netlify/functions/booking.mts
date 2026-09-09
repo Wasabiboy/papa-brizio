@@ -1,6 +1,6 @@
 import type { Config } from "@netlify/functions";
 import { neon } from "@neondatabase/serverless";
-import { Resend } from "resend";
+import { sendGuestMessage, sendStaffAlert } from "./_lib/mail";
 import { env } from "./_lib/env";
 import { isValidSlot, settingsFromRow } from "./_lib/venue";
 
@@ -27,16 +27,6 @@ function clip(value: unknown, max: number) {
   return String(value ?? "").trim().slice(0, max);
 }
 
-function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  }[char] ?? char));
-}
-
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
     status,
@@ -49,49 +39,6 @@ function guestName(payload: Required<Pick<BookingPayload, "firstName" | "lastNam
   return full || payload.name;
 }
 
-function emailCopy(kind: BookingKind, data: {
-  guest: string;
-  phone: string;
-  email: string;
-  partySize: string;
-  date: string;
-  time: string;
-  notes: string;
-}) {
-  const title = kind === "hightea" ? "High Tea booking" : "Table reservation";
-  const lines = [
-    `${title} request`,
-    "",
-    `Name: ${data.guest}`,
-    `Phone: ${data.phone}`,
-    `Email: ${data.email}`,
-    `Party: ${data.partySize}`,
-    `Date: ${data.date}`,
-    `Time: ${data.time}`,
-    `Notes: ${data.notes || "None"}`,
-    "",
-    "This request is pending confirmation.",
-  ];
-  const text = lines.join("\n");
-  const html = `
-    <div style="font-family:Georgia,serif;background:#14110f;color:#f5f0e8;padding:32px;">
-      <p style="color:#c9a96e;letter-spacing:0.16em;text-transform:uppercase;font-size:12px;margin:0 0 8px;">Papà Brizio</p>
-      <h1 style="font-weight:400;font-size:28px;margin:0 0 24px;">${escapeHtml(title)}</h1>
-      <table style="border-collapse:collapse;font-size:16px;line-height:1.6;">
-        <tr><td style="padding:4px 16px 4px 0;color:#c9a96e;">Name</td><td>${escapeHtml(data.guest)}</td></tr>
-        <tr><td style="padding:4px 16px 4px 0;color:#c9a96e;">Phone</td><td>${escapeHtml(data.phone)}</td></tr>
-        <tr><td style="padding:4px 16px 4px 0;color:#c9a96e;">Email</td><td>${escapeHtml(data.email)}</td></tr>
-        <tr><td style="padding:4px 16px 4px 0;color:#c9a96e;">Party</td><td>${escapeHtml(data.partySize)}</td></tr>
-        <tr><td style="padding:4px 16px 4px 0;color:#c9a96e;">Date</td><td>${escapeHtml(data.date)}</td></tr>
-        <tr><td style="padding:4px 16px 4px 0;color:#c9a96e;">Time</td><td>${escapeHtml(data.time)}</td></tr>
-        <tr><td style="padding:4px 16px 4px 0;color:#c9a96e;">Notes</td><td>${escapeHtml(data.notes || "None")}</td></tr>
-      </table>
-      <p style="margin:24px 0 0;color:#b9b0a4;font-size:14px;">This request is pending confirmation.</p>
-    </div>
-  `;
-  return { title, text, html };
-}
-
 export default async (req: Request) => {
   if (req.method !== "POST") {
     return json(405, { error: "Use POST to send a booking." });
@@ -99,9 +46,6 @@ export default async (req: Request) => {
 
   const databaseUrl = env("DATABASE_URL");
   const resendKey = env("RESEND_API_KEY");
-  const notifyEmail = env("BOOKING_NOTIFY_EMAIL") || "montrosecafe@xtra.co.nz";
-  const testEmail = env("BOOKING_TEST_EMAIL");
-  const fromEmail = env("RESEND_FROM") || "Papa Brizio <onboarding@resend.dev>";
 
   if (!databaseUrl) {
     return json(500, { error: "Bookings are not configured yet." });
@@ -180,7 +124,8 @@ export default async (req: Request) => {
     return json(500, { error: "We couldn't save that request. Please call 09 478 9610." });
   }
 
-  const copy = emailCopy(kind, {
+  const mail = {
+    kind,
     guest,
     phone,
     email,
@@ -188,45 +133,11 @@ export default async (req: Request) => {
     date,
     time,
     notes,
-  });
-  const resend = new Resend(resendKey);
-
+  };
   try {
-    const staffTo = [...new Set([notifyEmail, testEmail].filter(Boolean))];
-    for (const to of staffTo) {
-      const staff = await resend.emails.send({
-        from: fromEmail,
-        to,
-        replyTo: email,
-        subject: `${copy.title} — ${guest}`,
-        text: copy.text,
-        html: copy.html,
-      });
-      if (staff.error) {
-        console.error("staff email failed", to, staff.error);
-      }
-    }
-
-    const guestMail = await resend.emails.send({
-      from: fromEmail,
-      to: email,
-      replyTo: notifyEmail,
-      subject: `We received your ${copy.title.toLowerCase()} request`,
-      text: [
-        `Kia ora ${guest},`,
-        "",
-        "Thanks for your request at Papà Brizio, 1 Montrose Terrace, Mairangi Bay.",
-        "",
-        copy.text,
-        "",
-        "We'll confirm by phone or email shortly.",
-        "If you need to change anything, call 09 478 9610.",
-      ].join("\n"),
-      html: `${copy.html}<p style="font-family:Georgia,serif;color:#b9b0a4;padding:0 32px 32px;margin:0;">We'll confirm by phone or email shortly. Call 09 478 9610 if you need to change anything.</p>`,
-    });
-    if (guestMail.error) {
-      console.error("guest confirmation failed", guestMail.error);
-    }
+    await sendStaffAlert(mail);
+    const guestMail = await sendGuestMessage(mail, "request");
+    if (!guestMail.ok) console.error("guest request email failed", guestMail.error);
   } catch (error) {
     console.error("booking email failed", error);
   }
@@ -234,7 +145,7 @@ export default async (req: Request) => {
   return json(201, {
     ok: true,
     id: bookingId,
-    message: "Request received. We'll confirm by phone or email.",
+    message: "We've emailed you. We'll confirm your booking shortly.",
   });
 };
 

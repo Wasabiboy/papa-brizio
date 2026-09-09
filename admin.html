@@ -18,7 +18,13 @@
   body { background: var(--bg); color: var(--cream); font-family: var(--sans); min-height: 100vh; }
   a { color: var(--gold); }
   button, input, select, textarea { font: inherit; }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .summary { margin-top: 1rem; font-family: var(--serif); font-size: 1.35rem; color: var(--gold); }
+  .guest-name { font-family: var(--serif); font-size: 1.2rem; }
+  .guest-phone { display: block; font-size: .8rem; color: var(--muted); margin-top: .15rem; }
+  .covers { font-family: var(--serif); font-size: 1.35rem; color: var(--gold); }
+  .check { display: flex; align-items: center; gap: .55rem; margin-top: 1rem; color: var(--muted); }
+  .check input { width: auto; }
   .brand { font-family: var(--serif); font-size: 2rem; font-weight: 400; }
   .brand span { color: var(--gold); font-style: italic; }
   .sub { color: var(--muted); margin-top: .35rem; }
@@ -84,7 +90,7 @@
     <header class="bar">
       <div>
         <p class="brand">Papà <span>Brizio</span></p>
-        <p class="sub">Bookings and opening hours</p>
+        <p class="sub">Who’s booked, party size, and table allocation</p>
       </div>
       <div class="tabs">
         <button type="button" class="tab on" data-tab="bookings">Bookings</button>
@@ -121,12 +127,13 @@
             </select>
           </div>
         </div>
+        <p class="summary" id="bookingSummary"></p>
       </div>
       <div class="layout" style="margin-top:1.25rem">
         <div class="card" style="overflow:auto">
           <table>
             <thead>
-              <tr><th>When</th><th>Guest</th><th>Party</th><th>Status</th></tr>
+              <tr><th>When</th><th>Guest</th><th>Covers</th><th>Table</th><th>Status</th></tr>
             </thead>
             <tbody id="bookingRows"></tbody>
           </table>
@@ -179,7 +186,7 @@
           </div>
           <div class="row row-3" style="margin-top:1rem">
             <div>
-              <label for="editParty">Party</label>
+              <label for="editParty">Party / covers</label>
               <input id="editParty">
             </div>
             <div>
@@ -192,11 +199,20 @@
             </div>
           </div>
           <div style="margin-top:1rem">
+            <label for="editTable">Table</label>
+            <input id="editTable" placeholder="e.g. 7, Window, Patio 2">
+          </div>
+          <div style="margin-top:1rem">
             <label for="editNotes">Notes</label>
             <textarea id="editNotes"></textarea>
           </div>
+          <label class="check">
+            <input type="checkbox" id="emailGuest" checked>
+            Email the guest a confirmation
+          </label>
           <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.1rem">
-            <button class="btn" type="submit">Save changes</button>
+            <button class="btn" type="button" id="confirmBooking">Confirm &amp; email guest</button>
+            <button class="btn btn-ghost" type="submit">Save changes</button>
             <button class="btn btn-danger" type="button" id="cancelBooking">Mark cancelled</button>
           </div>
           <p class="status" id="editStatusMsg"></p>
@@ -252,14 +268,26 @@
     el.className = "status" + (kind ? " " + kind : "");
     el.textContent = text || "";
   }
+  function isoDate(value) {
+    const raw = String(value || "");
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+    const date = new Date(raw);
+    if (Number.isNaN(date.getTime())) return raw.slice(0, 10);
+    return date.toLocaleDateString("en-CA", { timeZone: "Pacific/Auckland" });
+  }
   function prettyDate(iso) {
-    if (!iso) return "";
-    return new Date(String(iso).slice(0, 10) + "T12:00:00").toLocaleDateString("en-NZ", {
+    const day = isoDate(iso);
+    if (!day) return "";
+    return new Date(day + "T12:00:00").toLocaleDateString("en-NZ", {
       weekday: "short", day: "numeric", month: "short"
     });
   }
   function guestName(row) {
     return [row.first_name, row.last_name].filter(Boolean).join(" ").trim() || row.name || "Guest";
+  }
+  function coversOf(row) {
+    const n = parseInt(String(row.party_size || ""), 10);
+    return Number.isFinite(n) ? n : 0;
   }
   async function api(url, opts) {
     const res = await fetch(url, { credentials: "same-origin", headers: { "content-type": "application/json" }, ...opts });
@@ -313,18 +341,34 @@
     bookings = data.bookings || [];
     bookingRows.replaceChildren();
     bookingEmpty.hidden = bookings.length > 0;
+    const covers = bookings.reduce((sum, row) => sum + coversOf(row), 0);
+    const pending = bookings.filter((row) => row.status === "pending").length;
+    document.getElementById("bookingSummary").textContent =
+      bookings.length + (bookings.length === 1 ? " booking" : " bookings") +
+      " · " + covers + (covers === 1 ? " guest" : " guests") +
+      (pending ? " · " + pending + " pending" : "");
     bookings.forEach((row) => {
       const tr = document.createElement("tr");
       tr.className = "book" + (row.id === selectedId ? " on" : "");
-      tr.innerHTML = "<td></td><td></td><td></td><td></td>";
+      tr.innerHTML = "<td></td><td></td><td></td><td></td><td></td>";
       const cells = tr.querySelectorAll("td");
       cells[0].textContent = prettyDate(row.visit_date) + " · " + (row.visit_time || "");
-      cells[1].textContent = guestName(row) + (row.kind === "hightea" ? " (High Tea)" : "");
-      cells[2].textContent = row.party_size || "";
+      const name = document.createElement("span");
+      name.className = "guest-name";
+      name.textContent = guestName(row) + (row.kind === "hightea" ? " · High Tea" : "");
+      const phone = document.createElement("span");
+      phone.className = "guest-phone";
+      phone.textContent = row.phone || "";
+      cells[1].append(name, phone);
+      const coversEl = document.createElement("span");
+      coversEl.className = "covers";
+      coversEl.textContent = String(row.party_size || "—");
+      cells[2].appendChild(coversEl);
+      cells[3].textContent = row.table_label || "—";
       const pill = document.createElement("span");
       pill.className = "pill " + (row.status || "pending");
       pill.textContent = row.status || "pending";
-      cells[3].appendChild(pill);
+      cells[4].appendChild(pill);
       tr.addEventListener("click", () => fillEditor(row));
       bookingRows.appendChild(tr);
     });
@@ -343,22 +387,26 @@
     document.getElementById("editPhone").value = row.phone || "";
     document.getElementById("editEmail").value = row.email || "";
     document.getElementById("editParty").value = row.party_size || "";
-    document.getElementById("editDate").value = String(row.visit_date || "").slice(0, 10);
+    document.getElementById("editDate").value = isoDate(row.visit_date);
     document.getElementById("editTime").value = row.visit_time || "";
+    document.getElementById("editTable").value = row.table_label || "";
     document.getElementById("editNotes").value = row.notes || "";
+    document.getElementById("emailGuest").checked = row.status !== "confirmed";
     setStatus(document.getElementById("editStatusMsg"), "");
   }
 
-  async function saveBooking(statusOverride) {
+  async function saveBooking(statusOverride, forceEmail) {
     const msg = document.getElementById("editStatusMsg");
+    const status = statusOverride || document.getElementById("editStatus").value;
+    const emailGuest = forceEmail === true || (document.getElementById("emailGuest").checked && status === "confirmed");
     try {
-      setStatus(msg, "Saving…");
-      await api("/api/admin/bookings", {
+      setStatus(msg, emailGuest ? "Saving and emailing the guest…" : "Saving…");
+      const data = await api("/api/admin/bookings", {
         method: "POST",
         body: JSON.stringify({
           id: document.getElementById("editId").value,
           kind: document.getElementById("editKind").value,
-          status: statusOverride || document.getElementById("editStatus").value,
+          status,
           firstName: document.getElementById("editFirst").value,
           lastName: document.getElementById("editLast").value,
           name: document.getElementById("editName").value,
@@ -367,17 +415,23 @@
           partySize: document.getElementById("editParty").value,
           date: document.getElementById("editDate").value,
           time: document.getElementById("editTime").value,
-          notes: document.getElementById("editNotes").value
+          tableLabel: document.getElementById("editTable").value,
+          notes: document.getElementById("editNotes").value,
+          emailGuest
         })
       });
-      setStatus(msg, "Saved.", "ok");
+      if (data.warning) setStatus(msg, data.warning, "err");
+      else if (data.emailed) setStatus(msg, "Saved and confirmation emailed to the guest.", "ok");
+      else setStatus(msg, "Saved.", "ok");
+      document.getElementById("editStatus").value = status;
       await loadBookings();
     } catch (err) {
       setStatus(msg, err.message, "err");
     }
   }
   editForm.addEventListener("submit", (e) => { e.preventDefault(); saveBooking(); });
-  document.getElementById("cancelBooking").addEventListener("click", () => saveBooking("cancelled"));
+  document.getElementById("confirmBooking").addEventListener("click", () => saveBooking("confirmed", true));
+  document.getElementById("cancelBooking").addEventListener("click", () => saveBooking("cancelled", false));
 
   function renderClosed() {
     const list = document.getElementById("closedList");

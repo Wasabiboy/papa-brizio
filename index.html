@@ -1068,7 +1068,7 @@
           </div>
           <button type="submit" class="btn-primary" id="htSubmit">Book High Tea</button>
           <p class="form-status" id="highteaStatus" role="status"></p>
-          <p class="hightea-form-note">We'll confirm your booking by phone or email. A $70 deposit is required to secure your spot — refunded if cancelled 24hrs prior.</p>
+          <p class="hightea-form-note">You'll get an email as soon as you request. We'll confirm shortly. A $70 deposit is required to secure your spot — refunded if cancelled 24hrs prior.</p>
         </form>
         <p style="margin-top:1.5rem;font-size:0.9rem;color:var(--cream-dim);font-style:italic;">Follow us on <a href="https://www.facebook.com/montrosestreetfood/" target="_blank" style="color:var(--gold);">Facebook</a> for special events. Come dine with us. Food is subject to change and may not be the same as above pictures.</p>
       </div>
@@ -1684,7 +1684,7 @@
       if (!res.ok) throw new Error(data.error || 'Something went wrong. Please call 09 478 9610.');
       if (statusEl) {
         statusEl.className = 'form-status ok';
-        statusEl.textContent = data.message || "Request received. We'll confirm by phone or email.";
+        statusEl.textContent = data.message || "We've emailed you. We'll confirm your booking shortly.";
       }
       if (button) button.textContent = 'Request sent';
       return true;

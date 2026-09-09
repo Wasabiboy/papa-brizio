@@ -2,6 +2,7 @@ import type { Config } from "@netlify/functions";
 import { neon } from "@neondatabase/serverless";
 import { cookieHeader, isAuthed, makeToken, passwordOk } from "./_lib/auth";
 import { env } from "./_lib/env";
+import { sendGuestMessage, type BookingKind } from "./_lib/mail";
 import { DEFAULT_SETTINGS, isOpenOnDate, normalizeSettings, settingsFromRow } from "./_lib/venue";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -121,8 +122,8 @@ export default async (req: Request) => {
       const status = clip(url.searchParams.get("status"), 20) || "upcoming";
       const kind = clip(url.searchParams.get("kind"), 20);
       const rows = await sql`
-        SELECT id, kind, first_name, last_name, name, phone, email, party_size,
-               visit_date, visit_time, notes, status, created_at, updated_at
+        SELECT id, kind, first_name, last_name, name, phone, email, party_size, table_label,
+               visit_date::text AS visit_date, visit_time, notes, status, created_at, updated_at
         FROM bookings
         WHERE visit_date >= ${from}
           AND (${to}::date IS NULL OR visit_date <= ${to}::date)
@@ -157,8 +158,10 @@ export default async (req: Request) => {
       const date = clip(body.date, 10);
       const time = clip(body.time, 20);
       const notes = clip(body.notes, 1000);
+      const tableLabel = clip(body.tableLabel, 40);
       const status = clip(body.status, 20) || "pending";
-      const kind = clip(body.kind, 20);
+      const kind = clip(body.kind, 20) as BookingKind;
+      const emailGuest = body.emailGuest === true;
       const guest = [firstName, lastName].filter(Boolean).join(" ").trim() || name;
 
       if (!guest || !phone || !email || !partySize || !date || !time) {
@@ -186,14 +189,39 @@ export default async (req: Request) => {
           visit_date = ${date},
           visit_time = ${time},
           notes = ${notes || null},
+          table_label = ${tableLabel || null},
           status = ${status},
           updated_at = now()
         WHERE id = ${id}::uuid
-        RETURNING id, kind, first_name, last_name, name, phone, email, party_size,
-                  visit_date, visit_time, notes, status, created_at, updated_at
+        RETURNING id, kind, first_name, last_name, name, phone, email, party_size, table_label,
+                  visit_date::text AS visit_date, visit_time, notes, status, created_at, updated_at
       `;
       if (!rows[0]) return json(404, { error: "Booking not found." });
-      return json(200, { ok: true, booking: rows[0] });
+
+      let emailed = false;
+      if (emailGuest && status === "confirmed") {
+        const mail = await sendGuestMessage({
+          kind,
+          guest,
+          phone,
+          email,
+          partySize,
+          date,
+          time,
+          notes,
+          tableLabel,
+        }, "confirmed");
+        if (!mail.ok) {
+          return json(200, {
+            ok: true,
+            booking: rows[0],
+            warning: "Saved, but the guest email could not be sent. Check Resend or try again.",
+          });
+        }
+        emailed = true;
+      }
+
+      return json(200, { ok: true, booking: rows[0], emailed });
     }
     return json(405, { error: "Unsupported method." });
   }
