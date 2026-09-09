@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff admin — Papà Brizio</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0908; --panel: #14110f; --cream: #f5f0e8; --muted: #c9c1b3;
+    --gold: #c9a96e; --border: rgba(201,169,110,.18); --err: #e8a0a0;
+    --serif: "Cormorant Garamond", Georgia, serif; --sans: Inter, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--cream); font-family: var(--sans); min-height: 100vh; }
+  a { color: var(--gold); }
+  button, input, select, textarea { font: inherit; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .brand { font-family: var(--serif); font-size: 2rem; font-weight: 400; }
+  .brand span { color: var(--gold); font-style: italic; }
+  .sub { color: var(--muted); margin-top: .35rem; }
+  .card { background: var(--panel); border: 1px solid var(--border); padding: 1.5rem; margin-top: 1.5rem; }
+  label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: .35rem; }
+  input, select, textarea {
+    width: 100%; background: #0f0d0c; border: 1px solid var(--border);
+    color: var(--cream); padding: .75rem .85rem; border-radius: 0;
+  }
+  textarea { min-height: 90px; resize: vertical; }
+  .btn {
+    background: var(--gold); color: var(--bg); border: 0; padding: .8rem 1.3rem;
+    cursor: pointer; letter-spacing: .04em;
+  }
+  .btn:disabled { opacity: .55; cursor: wait; }
+  .btn-ghost { background: transparent; color: var(--cream); border: 1px solid var(--border); }
+  .btn-danger { background: transparent; color: var(--err); border: 1px solid var(--err); }
+  .row { display: grid; gap: 1rem; }
+  .row-2 { grid-template-columns: 1fr 1fr; }
+  .row-3 { grid-template-columns: repeat(3, 1fr); }
+  .status { margin-top: 1rem; color: var(--muted); }
+  .status.err { color: var(--err); }
+  .status.ok { color: var(--gold); }
+  header.bar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .tabs { display: flex; gap: .5rem; }
+  .tab { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: .55rem 1rem; cursor: pointer; }
+  .tab.on { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  th, td { text-align: left; padding: .7rem .5rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--gold); font-weight: 500; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+  tr.book { cursor: pointer; }
+  tr.book:hover { background: rgba(201,169,110,.08); }
+  tr.book.on { background: rgba(201,169,110,.16); }
+  .pill { display: inline-block; padding: .15rem .5rem; font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; }
+  .pill.pending { color: var(--gold); border: 1px solid var(--gold); }
+  .pill.confirmed { color: #cde3c4; border: 1px solid #4a5c3a; }
+  .pill.cancelled { color: var(--muted); border: 1px solid var(--border); }
+  .pill.completed { color: var(--cream); border: 1px solid var(--border); }
+  .layout { display: grid; grid-template-columns: 1.3fr .9fr; gap: 1.25rem; align-items: start; }
+  .hours-row { display: grid; grid-template-columns: 7.5rem 5rem 1fr 1fr; gap: .75rem; align-items: end; margin-bottom: .75rem; }
+  .closed-list { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
+  .chip { border: 1px solid var(--border); padding: .35rem .6rem; display: flex; gap: .5rem; align-items: center; }
+  .chip button { background: none; border: 0; color: var(--err); cursor: pointer; }
+  .empty { color: var(--muted); padding: 1.5rem 0; }
+  @media (max-width: 900px) {
+    .layout, .row-2, .row-3, .hours-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap" id="loginView">
+    <p class="brand">Papà <span>Brizio</span></p>
+    <p class="sub">Staff booking admin</p>
+    <form class="card" id="loginForm" style="max-width:420px">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button class="btn" type="submit" style="margin-top:1rem">Sign in</button>
+      <p class="status" id="loginStatus"></p>
+    </form>
+  </div>
+
+  <div class="wrap" id="appView" hidden>
+    <header class="bar">
+      <div>
+        <p class="brand">Papà <span>Brizio</span></p>
+        <p class="sub">Bookings and opening hours</p>
+      </div>
+      <div class="tabs">
+        <button type="button" class="tab on" data-tab="bookings">Bookings</button>
+        <button type="button" class="tab" data-tab="hours">Hours</button>
+        <a class="tab" href="/">Site</a>
+        <button type="button" class="tab" id="logoutBtn">Log out</button>
+      </div>
+    </header>
+
+    <section id="bookingsPanel">
+      <div class="card">
+        <div class="row row-3">
+          <div>
+            <label for="filterFrom">From</label>
+            <input id="filterFrom" type="date">
+          </div>
+          <div>
+            <label for="filterStatus">Status</label>
+            <select id="filterStatus">
+              <option value="upcoming">Upcoming</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="completed">Completed</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+          <div>
+            <label for="filterKind">Type</label>
+            <select id="filterKind">
+              <option value="all">All</option>
+              <option value="table">Table</option>
+              <option value="hightea">High Tea</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="layout" style="margin-top:1.25rem">
+        <div class="card" style="overflow:auto">
+          <table>
+            <thead>
+              <tr><th>When</th><th>Guest</th><th>Party</th><th>Status</th></tr>
+            </thead>
+            <tbody id="bookingRows"></tbody>
+          </table>
+          <p class="empty" id="bookingEmpty" hidden>No bookings in this range.</p>
+        </div>
+        <form class="card" id="editForm" hidden>
+          <h2 class="brand" style="font-size:1.6rem;margin-bottom:1rem">Edit booking</h2>
+          <input type="hidden" id="editId">
+          <div class="row row-2">
+            <div>
+              <label for="editKind">Type</label>
+              <select id="editKind">
+                <option value="table">Table</option>
+                <option value="hightea">High Tea</option>
+              </select>
+            </div>
+            <div>
+              <label for="editStatus">Status</label>
+              <select id="editStatus">
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+          <div class="row row-2" style="margin-top:1rem">
+            <div>
+              <label for="editFirst">First name</label>
+              <input id="editFirst">
+            </div>
+            <div>
+              <label for="editLast">Last name</label>
+              <input id="editLast">
+            </div>
+          </div>
+          <div style="margin-top:1rem">
+            <label for="editName">Display name</label>
+            <input id="editName">
+          </div>
+          <div class="row row-2" style="margin-top:1rem">
+            <div>
+              <label for="editPhone">Phone</label>
+              <input id="editPhone">
+            </div>
+            <div>
+              <label for="editEmail">Email</label>
+              <input id="editEmail" type="email">
+            </div>
+          </div>
+          <div class="row row-3" style="margin-top:1rem">
+            <div>
+              <label for="editParty">Party</label>
+              <input id="editParty">
+            </div>
+            <div>
+              <label for="editDate">Date</label>
+              <input id="editDate" type="date">
+            </div>
+            <div>
+              <label for="editTime">Time</label>
+              <input id="editTime" placeholder="18:30">
+            </div>
+          </div>
+          <div style="margin-top:1rem">
+            <label for="editNotes">Notes</label>
+            <textarea id="editNotes"></textarea>
+          </div>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.1rem">
+            <button class="btn" type="submit">Save changes</button>
+            <button class="btn btn-danger" type="button" id="cancelBooking">Mark cancelled</button>
+          </div>
+          <p class="status" id="editStatusMsg"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="hoursPanel" hidden>
+      <form class="card" id="hoursForm">
+        <h2 class="brand" style="font-size:1.6rem;margin-bottom:.4rem">Opening hours</h2>
+        <p class="sub" style="margin-bottom:1.25rem">These hours drive the public booking calendar. Close a day or change times, then save.</p>
+        <div style="max-width:220px;margin-bottom:1.25rem">
+          <label for="slotMinutes">Time slot size</label>
+          <select id="slotMinutes">
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
+            <option value="60">60 minutes</option>
+          </select>
+        </div>
+        <div id="hoursDays"></div>
+        <h3 class="brand" style="font-size:1.3rem;margin:1.5rem 0 .6rem">Extra closed dates</h3>
+        <div class="row row-2">
+          <div>
+            <label for="closedDate">Add a closed date</label>
+            <input id="closedDate" type="date">
+          </div>
+          <div style="align-self:end">
+            <button class="btn btn-ghost" type="button" id="addClosed">Add date</button>
+          </div>
+        </div>
+        <div class="closed-list" id="closedList"></div>
+        <button class="btn" type="submit">Save hours</button>
+        <p class="status" id="hoursStatus"></p>
+      </form>
+    </section>
+  </div>
+
+<script>
+  const loginView = document.getElementById("loginView");
+  const appView = document.getElementById("appView");
+  const bookingRows = document.getElementById("bookingRows");
+  const bookingEmpty = document.getElementById("bookingEmpty");
+  const editForm = document.getElementById("editForm");
+  let bookings = [];
+  let selectedId = "";
+  let closedDates = [];
+
+  function todayIso() {
+    const nz = new Date().toLocaleString("en-CA", { timeZone: "Pacific/Auckland" }).slice(0, 10);
+    return nz;
+  }
+  function setStatus(el, text, kind) {
+    el.className = "status" + (kind ? " " + kind : "");
+    el.textContent = text || "";
+  }
+  function prettyDate(iso) {
+    if (!iso) return "";
+    return new Date(String(iso).slice(0, 10) + "T12:00:00").toLocaleDateString("en-NZ", {
+      weekday: "short", day: "numeric", month: "short"
+    });
+  }
+  function guestName(row) {
+    return [row.first_name, row.last_name].filter(Boolean).join(" ").trim() || row.name || "Guest";
+  }
+  async function api(url, opts) {
+    const res = await fetch(url, { credentials: "same-origin", headers: { "content-type": "application/json" }, ...opts });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Request failed");
+    return data;
+  }
+
+  async function showApp() {
+    loginView.hidden = true;
+    appView.hidden = false;
+    document.getElementById("filterFrom").value = todayIso();
+    await Promise.all([loadBookings(), loadHours()]);
+  }
+
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const status = document.getElementById("loginStatus");
+    try {
+      setStatus(status, "Signing in…");
+      await api("/api/admin/session", { method: "POST", body: JSON.stringify({ password: document.getElementById("password").value }) });
+      await showApp();
+    } catch (err) {
+      setStatus(status, err.message, "err");
+    }
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await api("/api/admin/session", { method: "DELETE" }).catch(() => {});
+    location.reload();
+  });
+
+  document.querySelectorAll(".tab[data-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab[data-tab]").forEach((el) => el.classList.toggle("on", el === btn));
+      const tab = btn.getAttribute("data-tab");
+      document.getElementById("bookingsPanel").hidden = tab !== "bookings";
+      document.getElementById("hoursPanel").hidden = tab !== "hours";
+    });
+  });
+
+  ["filterFrom", "filterStatus", "filterKind"].forEach((id) => {
+    document.getElementById(id).addEventListener("change", loadBookings);
+  });
+
+  async function loadBookings() {
+    const from = document.getElementById("filterFrom").value || todayIso();
+    const status = document.getElementById("filterStatus").value;
+    const kind = document.getElementById("filterKind").value;
+    const data = await api("/api/admin/bookings?from=" + encodeURIComponent(from) + "&status=" + encodeURIComponent(status) + "&kind=" + encodeURIComponent(kind));
+    bookings = data.bookings || [];
+    bookingRows.replaceChildren();
+    bookingEmpty.hidden = bookings.length > 0;
+    bookings.forEach((row) => {
+      const tr = document.createElement("tr");
+      tr.className = "book" + (row.id === selectedId ? " on" : "");
+      tr.innerHTML = "<td></td><td></td><td></td><td></td>";
+      const cells = tr.querySelectorAll("td");
+      cells[0].textContent = prettyDate(row.visit_date) + " · " + (row.visit_time || "");
+      cells[1].textContent = guestName(row) + (row.kind === "hightea" ? " (High Tea)" : "");
+      cells[2].textContent = row.party_size || "";
+      const pill = document.createElement("span");
+      pill.className = "pill " + (row.status || "pending");
+      pill.textContent = row.status || "pending";
+      cells[3].appendChild(pill);
+      tr.addEventListener("click", () => fillEditor(row));
+      bookingRows.appendChild(tr);
+    });
+  }
+
+  function fillEditor(row) {
+    selectedId = row.id;
+    [...bookingRows.children].forEach((tr, i) => tr.classList.toggle("on", bookings[i]?.id === row.id));
+    editForm.hidden = false;
+    document.getElementById("editId").value = row.id;
+    document.getElementById("editKind").value = row.kind || "table";
+    document.getElementById("editStatus").value = row.status || "pending";
+    document.getElementById("editFirst").value = row.first_name || "";
+    document.getElementById("editLast").value = row.last_name || "";
+    document.getElementById("editName").value = row.name || "";
+    document.getElementById("editPhone").value = row.phone || "";
+    document.getElementById("editEmail").value = row.email || "";
+    document.getElementById("editParty").value = row.party_size || "";
+    document.getElementById("editDate").value = String(row.visit_date || "").slice(0, 10);
+    document.getElementById("editTime").value = row.visit_time || "";
+    document.getElementById("editNotes").value = row.notes || "";
+    setStatus(document.getElementById("editStatusMsg"), "");
+  }
+
+  async function saveBooking(statusOverride) {
+    const msg = document.getElementById("editStatusMsg");
+    try {
+      setStatus(msg, "Saving…");
+      await api("/api/admin/bookings", {
+        method: "POST",
+        body: JSON.stringify({
+          id: document.getElementById("editId").value,
+          kind: document.getElementById("editKind").value,
+          status: statusOverride || document.getElementById("editStatus").value,
+          firstName: document.getElementById("editFirst").value,
+          lastName: document.getElementById("editLast").value,
+          name: document.getElementById("editName").value,
+          phone: document.getElementById("editPhone").value,
+          email: document.getElementById("editEmail").value,
+          partySize: document.getElementById("editParty").value,
+          date: document.getElementById("editDate").value,
+          time: document.getElementById("editTime").value,
+          notes: document.getElementById("editNotes").value
+        })
+      });
+      setStatus(msg, "Saved.", "ok");
+      await loadBookings();
+    } catch (err) {
+      setStatus(msg, err.message, "err");
+    }
+  }
+  editForm.addEventListener("submit", (e) => { e.preventDefault(); saveBooking(); });
+  document.getElementById("cancelBooking").addEventListener("click", () => saveBooking("cancelled"));
+
+  function renderClosed() {
+    const list = document.getElementById("closedList");
+    list.replaceChildren();
+    closedDates.forEach((date) => {
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      const label = document.createElement("span");
+      label.textContent = prettyDate(date);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "×";
+      btn.addEventListener("click", () => {
+        closedDates = closedDates.filter((d) => d !== date);
+        renderClosed();
+      });
+      chip.append(label, btn);
+      list.appendChild(chip);
+    });
+  }
+
+  function hoursPayload() {
+    const hours = [...document.querySelectorAll(".hours-row")].map((row) => {
+      const closed = row.querySelector(".day-closed").checked;
+      return {
+        weekday: Number(row.dataset.weekday),
+        label: row.dataset.label,
+        closed,
+        open: closed ? null : row.querySelector(".day-open").value || null,
+        lastSlot: closed ? null : row.querySelector(".day-last").value || null
+      };
+    });
+    return { timezone: "Pacific/Auckland", slotMinutes: Number(document.getElementById("slotMinutes").value), hours, closedDates };
+  }
+
+  async function loadHours() {
+    const data = await api("/api/admin/hours");
+    document.getElementById("slotMinutes").value = String(data.slotMinutes || 15);
+    closedDates = data.closedDates || [];
+    const box = document.getElementById("hoursDays");
+    box.replaceChildren();
+    (data.hours || []).forEach((day) => {
+      const row = document.createElement("div");
+      row.className = "hours-row";
+      row.dataset.weekday = day.weekday;
+      row.dataset.label = day.label;
+      row.innerHTML = '<div><label>Day</label><input class="day-label" disabled></div>' +
+        '<div><label>Closed</label><input class="day-closed" type="checkbox" style="width:auto;margin-top:.7rem"></div>' +
+        '<div><label>Opens</label><input class="day-open" type="time"></div>' +
+        '<div><label>Last seating</label><input class="day-last" type="time"></div>';
+      row.querySelector(".day-label").value = day.label;
+      row.querySelector(".day-closed").checked = Boolean(day.closed);
+      row.querySelector(".day-open").value = day.open || "";
+      row.querySelector(".day-last").value = day.lastSlot || "";
+      box.appendChild(row);
+    });
+    renderClosed();
+  }
+
+  document.getElementById("addClosed").addEventListener("click", () => {
+    const value = document.getElementById("closedDate").value;
+    if (value && !closedDates.includes(value)) {
+      closedDates.push(value);
+      closedDates.sort();
+      renderClosed();
+    }
+  });
+
+  document.getElementById("hoursForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const status = document.getElementById("hoursStatus");
+    try {
+      setStatus(status, "Saving…");
+      await api("/api/admin/hours", { method: "POST", body: JSON.stringify(hoursPayload()) });
+      setStatus(status, "Hours saved. The public booking form will use these next time it loads.", "ok");
+    } catch (err) {
+      setStatus(status, err.message, "err");
+    }
+  });
+
+  api("/api/admin/session", { method: "GET" }).then(showApp).catch(() => {});
+</script>
+</body>
+</html>

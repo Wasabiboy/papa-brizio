@@ -492,10 +492,13 @@
     font-size: 1.05rem; letter-spacing: 0.04em; text-transform: none;
     padding: 0.9rem 1.8rem;
   }
-  .res-note, .res-closed {
+  .res-note, .res-closed, .form-status {
     font-size: 0.9rem; color: var(--cream-dim); margin-top: 1rem; font-style: italic;
   }
   .res-closed { color: var(--gold); }
+  .form-status.ok { color: var(--gold); font-style: normal; }
+  .form-status.error { color: #e8a0a0; font-style: normal; }
+  .btn-primary:disabled { opacity: 0.55; cursor: wait; }
   .res-step { display: none; }
   .res-step.active { display: block; }
   .res-complete {
@@ -1009,35 +1012,35 @@
         <div style="margin:1.5rem 0;">
           <p style="font-size:1.05rem;color:#fff;"><strong style="color:var(--gold);">Fully trained baristas</strong> delivering exceptional coffee from Atlas Power Roast — organic milk or choose from many milk substitutes.</p>
         </div>
-        <form class="hightea-form" onsubmit="handleHighTeaBooking(event)">
+        <form class="hightea-form" id="highteaForm">
           <div class="hightea-form-row">
             <div>
-              <label>Name *</label>
-              <input type="text" required placeholder="Your name">
+              <label for="htName">Name *</label>
+              <input id="htName" type="text" required placeholder="Your name">
             </div>
             <div>
-              <label>Phone No. *</label>
-              <input type="tel" required placeholder="09 478 9610">
+              <label for="htPhone">Phone No. *</label>
+              <input id="htPhone" type="tel" required placeholder="09 478 9610">
             </div>
           </div>
           <div class="hightea-form-row">
             <div>
-              <label>Email *</label>
-              <input type="email" required placeholder="you@email.com">
+              <label for="htEmail">Email *</label>
+              <input id="htEmail" type="email" required placeholder="you@email.com">
             </div>
             <div>
-              <label>Number for High Tea *</label>
-              <input type="number" required min="2" placeholder="2">
+              <label for="htGuests">Number for High Tea *</label>
+              <input id="htGuests" type="number" required min="2" placeholder="2">
             </div>
           </div>
           <div class="hightea-form-row">
             <div>
-              <label>Date *</label>
-              <input type="date" required>
+              <label for="htDate">Date *</label>
+              <input id="htDate" type="date" required>
             </div>
             <div>
-              <label>Time *</label>
-              <select required>
+              <label for="htTime">Time *</label>
+              <select id="htTime" required>
                 <option value="">Select time</option>
                 <option>2:00 PM</option>
                 <option>2:30 PM</option>
@@ -1049,10 +1052,11 @@
             </div>
           </div>
           <div>
-            <label>High Tea Details</label>
-            <textarea placeholder="Any special requests, dietary requirements, allergies, or occasion details..."></textarea>
+            <label for="htDetails">High Tea Details</label>
+            <textarea id="htDetails" placeholder="Any special requests, dietary requirements, allergies, or occasion details..."></textarea>
           </div>
-          <button type="submit" class="btn-primary">Book High Tea</button>
+          <button type="submit" class="btn-primary" id="htSubmit">Book High Tea</button>
+          <p class="form-status" id="highteaStatus" role="status"></p>
           <p class="hightea-form-note">We'll confirm your booking by phone or email. A $70 deposit is required to secure your spot — refunded if cancelled 24hrs prior.</p>
         </form>
         <p style="margin-top:1.5rem;font-size:0.9rem;color:var(--cream-dim);font-style:italic;">Follow us on <a href="https://www.facebook.com/montrosestreetfood/" target="_blank" style="color:var(--gold);">Facebook</a> for special events. Come dine with us. Food is subject to change and may not be the same as above pictures.</p>
@@ -1098,7 +1102,7 @@
           <label for="resTimeSelect">Time</label>
           <select id="resTimeSelect"></select>
         </div>
-        <p class="res-closed" id="resClosed" hidden>We’re closed on Mondays. Please choose another day, or call 09 478 9610.</p>
+        <p class="res-closed" id="resClosed" hidden>We’re closed on this day. Please choose another day, or call 09 478 9610.</p>
         <p class="res-slots-label" id="resSlotsLabel">Please choose an available time slot:</p>
         <div class="res-slots" id="resSlots"></div>
         <p class="res-note" id="resLargeNote" hidden>For groups of 13 or more, we recommend calling 09 478 9610 so we can arrange the best seating.</p>
@@ -1136,7 +1140,8 @@
               <label for="resSpecial">Special request</label>
               <textarea id="resSpecial" placeholder="Allergies, occasion, high chair, outdoor seating…"></textarea>
             </div>
-            <button type="submit" class="btn-primary">Complete Request</button>
+            <button type="submit" class="btn-primary" id="resSubmit">Complete Request</button>
+            <p class="form-status" id="resStatus" role="status"></p>
           </form>
           <aside class="res-summary">
             <h3>Request details:</h3>
@@ -1559,9 +1564,28 @@
     return d.toLocaleDateString('en-NZ', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
   }
 
+  function toMinutes(hhmm) {
+    const m = String(hhmm || '').trim().match(/^(\d{1,2}):(\d{2})/);
+    if (!m) return null;
+    return Number(m[1]) * 60 + Number(m[2]);
+  }
+
+  let venueHours = null;
+  let slotMinutes = 15;
+  let closedDates = [];
+
   function hoursForDate(iso) {
+    if (closedDates.includes(iso)) return null;
     const day = new Date(iso + 'T12:00:00').getDay(); // 0 Sun … 6 Sat
-    if (day === 1) return null; // Monday closed
+    if (Array.isArray(venueHours)) {
+      const row = venueHours.find(h => Number(h.weekday) === day);
+      if (!row || row.closed || !row.open || !row.lastSlot) return null;
+      const start = toMinutes(row.open);
+      const end = toMinutes(row.lastSlot);
+      if (start == null || end == null) return null;
+      return { start, end };
+    }
+    if (day === 1) return null;
     if (day === 0 || day === 6) return { start: 9 * 60, end: 20 * 60 + 30 };
     return { start: 10 * 60, end: 20 * 60 + 30 };
   }
@@ -1569,14 +1593,15 @@
   function slotsForDate(iso) {
     const hours = hoursForDate(iso);
     if (!hours) return [];
+    const step = slotMinutes || 15;
     const out = [];
-    for (let t = hours.start; t <= hours.end; t += 15) out.push(formatTime(t));
+    for (let t = hours.start; t <= hours.end; t += step) out.push(formatTime(t));
     return out;
   }
 
   function nextOpenDate(from) {
     const d = new Date(from);
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 90; i++) {
       const iso = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
       if (hoursForDate(iso)) return iso;
       d.setDate(d.getDate() + 1);
@@ -1627,7 +1652,43 @@
 
   enhanceSelect(resParty);
   enhanceSelect(resTimeSelect);
-  enhanceSelect(document.querySelector('.hightea-form select'));
+  enhanceSelect(document.getElementById('htTime'));
+
+  async function submitBooking(payload, statusEl, button) {
+    if (statusEl) {
+      statusEl.className = 'form-status';
+      statusEl.textContent = 'Sending your request…';
+    }
+    if (button) {
+      button.disabled = true;
+      button.dataset.label = button.dataset.label || button.textContent;
+    }
+    try {
+      const res = await fetch('/api/booking', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Something went wrong. Please call 09 478 9610.');
+      if (statusEl) {
+        statusEl.className = 'form-status ok';
+        statusEl.textContent = data.message || "Request received. We'll confirm by phone or email.";
+      }
+      if (button) button.textContent = 'Request sent';
+      return true;
+    } catch (err) {
+      if (statusEl) {
+        statusEl.className = 'form-status error';
+        statusEl.textContent = err.message || 'Please call 09 478 9610.';
+      }
+      if (button) {
+        button.disabled = false;
+        button.textContent = button.dataset.label;
+      }
+      return false;
+    }
+  }
 
   if (resDate) {
     const today = new Date();
@@ -1661,50 +1722,48 @@
     });
     resDetailsForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const first = document.getElementById('resFirst').value.trim();
-      const last = document.getElementById('resLast').value.trim();
-      const phone = document.getElementById('resPhone').value.trim();
-      const email = document.getElementById('resEmail').value.trim();
-      const special = document.getElementById('resSpecial').value.trim();
       const partyLabel = resParty.options[resParty.selectedIndex].text;
-      const subject = encodeURIComponent('Table reservation — ' + first + ' ' + last);
-      const body = encodeURIComponent(
-        'First name: ' + first + '\\n' +
-        'Last name: ' + last + '\\n' +
-        'Phone: ' + phone + '\\n' +
-        'Email: ' + email + '\\n' +
-        'Party size: ' + partyLabel + '\\n' +
-        'Date: ' + resDate.value + '\\n' +
-        'Time: ' + selectedTime + '\\n' +
-        'Special request: ' + (special || 'None')
-      );
-      window.location.href = 'mailto:montrosecafe@xtra.co.nz?subject=' + subject + '&body=' + body;
+      submitBooking({
+        kind: 'table',
+        firstName: document.getElementById('resFirst').value.trim(),
+        lastName: document.getElementById('resLast').value.trim(),
+        phone: document.getElementById('resPhone').value.trim(),
+        email: document.getElementById('resEmail').value.trim(),
+        partySize: partyLabel,
+        date: resDate.value,
+        time: selectedTime,
+        notes: document.getElementById('resSpecial').value.trim()
+      }, document.getElementById('resStatus'), document.getElementById('resSubmit'));
     });
+    fetch('/api/hours')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data || !data.hours) return;
+        venueHours = data.hours;
+        slotMinutes = data.slotMinutes || 15;
+        closedDates = data.closedDates || [];
+        if (resDate.value && !hoursForDate(resDate.value)) {
+          resDate.value = nextOpenDate(resDate.value);
+        }
+        renderReservationSlots();
+      })
+      .catch(() => {});
   }
 
-  // High Tea booking form
-  function handleHighTeaBooking(e) {
+  const highteaForm = document.getElementById('highteaForm');
+  highteaForm?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const form = e.target;
-    const name = form.querySelector('input[type=text]').value;
-    const phone = form.querySelector('input[type=tel]').value;
-    const email = form.querySelector('input[type=email]').value;
-    const num = form.querySelector('input[type=number]').value;
-    const date = form.querySelector('input[type=date]').value;
-    const time = form.querySelector('select').value;
-    const details = form.querySelector('textarea').value;
-    const subject = encodeURIComponent('High Tea Booking — ' + name);
-    const body = encodeURIComponent(
-      'Name: ' + name + '\\n' +
-      'Phone: ' + phone + '\\n' +
-      'Email: ' + email + '\\n' +
-      'Number for High Tea: ' + num + '\\n' +
-      'Date: ' + date + '\\n' +
-      'Time: ' + time + '\\n' +
-      'Details: ' + (details || 'None')
-    );
-    window.location.href = 'mailto:montrosecafe@xtra.co.nz?subject=' + subject + '&body=' + body;
-  }
+    submitBooking({
+      kind: 'hightea',
+      name: document.getElementById('htName').value.trim(),
+      phone: document.getElementById('htPhone').value.trim(),
+      email: document.getElementById('htEmail').value.trim(),
+      partySize: document.getElementById('htGuests').value.trim(),
+      date: document.getElementById('htDate').value,
+      time: document.getElementById('htTime').value,
+      notes: document.getElementById('htDetails').value.trim()
+    }, document.getElementById('highteaStatus'), document.getElementById('htSubmit'));
+  });
 </script>
 </body>
 </html>

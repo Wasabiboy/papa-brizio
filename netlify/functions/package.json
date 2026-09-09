@@ -1,0 +1,10 @@
+{
+  "name": "papa-brizio-functions",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "@netlify/functions": "^5.1.2",
+    "resend": "^6.9.1"
+  }
+}
