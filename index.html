@@ -163,38 +163,53 @@
   @keyframes heroZoom { to { transform: scale(1); } }
   .hero-overlay {
     position: absolute; inset: 0;
-    background: linear-gradient(to bottom, rgba(10,9,8,0.5) 0%, rgba(10,9,8,0.3) 40%, rgba(10,9,8,0.85) 100%);
+    background:
+      radial-gradient(ellipse at center, rgba(10,9,8,0.55) 0%, rgba(10,9,8,0.28) 58%, rgba(10,9,8,0.72) 100%),
+      linear-gradient(to bottom, rgba(10,9,8,0.58) 0%, rgba(10,9,8,0.38) 42%, rgba(10,9,8,0.88) 100%);
   }
   .hero-content {
     position: relative; z-index: 2;
     text-align: center;
     padding: 0 2rem;
+    max-width: 56rem;
     animation: heroFade 2s ease 0.5s both;
+    text-shadow: 0 2px 18px rgba(0,0,0,0.55);
   }
   @keyframes heroFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
   .hero-tag {
-    font-size: 0.72rem;
-    letter-spacing: 0.4em;
+    font-size: clamp(1rem, 2.4vw, 1.25rem);
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 1.5rem;
+    color: var(--gold-bright);
+    font-weight: 500;
+    margin-bottom: 1.25rem;
   }
   .hero h1 {
     font-family: var(--serif);
-    font-size: clamp(3rem, 9vw, 7rem);
+    font-size: clamp(3.6rem, 11vw, 7.4rem);
     font-weight: 400;
     line-height: 0.95;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     letter-spacing: -0.01em;
+    color: var(--cream);
   }
-  .hero h1 .accent { color: var(--gold); font-style: italic; }
+  .hero h1 .accent { color: var(--gold-bright); font-style: italic; }
   .hero-sub {
     font-family: var(--serif);
-    font-size: clamp(1.1rem, 2vw, 1.5rem);
-    font-weight: 300;
+    font-size: clamp(1.45rem, 3.2vw, 2.15rem);
+    font-weight: 400;
     font-style: italic;
-    color: var(--cream-dim);
-    margin-bottom: 2.5rem;
+    color: var(--cream);
+    line-height: 1.35;
+    margin-bottom: 0.85rem;
+  }
+  .hero-hours {
+    font-family: var(--serif);
+    font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+    font-weight: 500;
+    color: var(--gold-bright);
+    margin-bottom: 2.4rem;
+    letter-spacing: 0.02em;
   }
   .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
   .btn-primary {
@@ -758,6 +773,9 @@
       transition: opacity 0.4s ease, visibility 0s linear 0s;
     }
     .nav-links a { font-size: 1.15rem; }
+    .hero-tag { letter-spacing: 0.14em; }
+    .hero-sub { font-size: 1.55rem; }
+    .hero-hours { font-size: 1.5rem; }
     section { padding: 5rem 1.5rem; }
     .story-grid, .menu-grid, .visit-grid { grid-template-columns: 1fr; gap: 2rem; }
     .visit-map { min-height: 280px; }
@@ -814,7 +832,7 @@
     <div class="hero-tag">Ristorante · Espresso Lounge</div>
     <h1>Papà <span class="accent">Brizio</span></h1>
     <p class="hero-sub">Where flavor, comfort & style meet in Mairangi Bay</p>
-    <p class="hero-sub" style="margin-top:0.4rem;font-size:1.05rem;">Open Wednesday – Sunday · 8am – 8pm</p>
+    <p class="hero-hours">Open Wednesday – Sunday · 8am – 8pm</p>
     <div class="hero-buttons">
       <a href="menu.html" class="btn-primary">View Menu</a>
       <a href="#reservations" class="btn-outline">Book a Table</a>
