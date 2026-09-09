@@ -410,19 +410,65 @@
     color: var(--cream); margin-bottom: 0.6rem;
   }
   .res-field select, .res-field input[type=date],
+  .res-details input, .res-details textarea,
+  .hightea-form select, .hightea-form input, .hightea-form textarea {
+    color-scheme: dark;
+  }
+  .res-field select, .res-field input[type=date],
   .res-details input, .res-details textarea {
-    width: 100%; background: transparent;
+    width: 100%; background: #14110f;
     border: 1px solid var(--border); color: var(--cream);
     padding: 0.85rem 1rem; font-family: var(--serif); font-size: 1.1rem;
     border-radius: 0; appearance: none;
   }
-  .res-field select {
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23c9a96e' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 1rem center;
+  .res-field select,
+  .res-dropdown-trigger {
+    background: #14110f url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23c9a96e' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 1rem center;
     padding-right: 2.5rem;
   }
+  .res-field select option, .hightea-form select option {
+    background-color: #14110f;
+    color: #f5f0e8;
+  }
   .res-field select:focus, .res-field input:focus,
-  .res-details input:focus, .res-details textarea:focus {
+  .res-details input:focus, .res-details textarea:focus,
+  .res-dropdown-trigger:focus {
     outline: none; border-color: var(--gold);
+  }
+  .res-dropdown { position: relative; }
+  .res-native-select {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0,0,0,0);
+  }
+  .res-dropdown-trigger {
+    width: 100%; text-align: left; cursor: pointer;
+    border: 1px solid var(--border); color: var(--cream);
+    padding: 0.85rem 2.5rem 0.85rem 1rem;
+    font-family: var(--serif); font-size: 1.1rem;
+  }
+  .res-dropdown-list {
+    position: absolute; left: 0; right: 0; top: calc(100% - 1px);
+    z-index: 20; max-height: 240px; overflow-y: auto;
+    background: #14110f; border: 1px solid var(--gold);
+    scrollbar-color: #c9a96e #14110f;
+  }
+  .res-dropdown-list::-webkit-scrollbar { width: 10px; }
+  .res-dropdown-list::-webkit-scrollbar-track { background: #14110f; }
+  .res-dropdown-list::-webkit-scrollbar-thumb { background: #5a3d2a; }
+  .res-dropdown-option {
+    display: block; width: 100%; text-align: left;
+    background: #14110f; color: #f5f0e8;
+    border: 0; border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1rem; cursor: pointer;
+    font-family: var(--serif); font-size: 1.05rem;
+  }
+  .res-dropdown-option:hover,
+  .res-dropdown-option.active {
+    background: #5a3d2a; color: #fff;
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.85);
+    cursor: pointer;
   }
   .res-slots-label {
     font-family: var(--serif); font-size: 1.05rem; color: var(--cream);
@@ -1422,6 +1468,77 @@
   const resChange = document.getElementById('resChange');
   let selectedTime = '';
 
+  function enhanceSelect(select) {
+    if (!select || select.dataset.enhanced) return;
+    select.dataset.enhanced = '1';
+    const wrap = document.createElement('div');
+    wrap.className = 'res-dropdown';
+    select.parentNode.insertBefore(wrap, select);
+    wrap.appendChild(select);
+    select.classList.add('res-native-select');
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'res-dropdown-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+
+    const list = document.createElement('div');
+    list.className = 'res-dropdown-list';
+    list.setAttribute('role', 'listbox');
+    list.hidden = true;
+
+    wrap.appendChild(trigger);
+    wrap.appendChild(list);
+
+    function close() {
+      list.hidden = true;
+      wrap.classList.remove('open');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function sync() {
+      const opt = select.options[select.selectedIndex];
+      trigger.textContent = opt ? opt.textContent : '';
+      list.innerHTML = '';
+      [...select.options].forEach((o, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'res-dropdown-option' + (i === select.selectedIndex ? ' active' : '');
+        btn.textContent = o.textContent;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          select.selectedIndex = i;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          sync();
+          close();
+        });
+        list.appendChild(btn);
+      });
+    }
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = list.hidden;
+      document.querySelectorAll('.res-dropdown.open').forEach(d => {
+        d.classList.remove('open');
+        const l = d.querySelector('.res-dropdown-list');
+        if (l) l.hidden = true;
+        const t = d.querySelector('.res-dropdown-trigger');
+        if (t) t.setAttribute('aria-expanded', 'false');
+      });
+      if (willOpen) {
+        list.hidden = false;
+        wrap.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+    document.addEventListener('click', close);
+    select.addEventListener('change', sync);
+    select._resSync = sync;
+    sync();
+  }
+
   function pad(n) { return String(n).padStart(2, '0'); }
 
   function formatTime(mins) {
@@ -1505,7 +1622,12 @@
       });
       resSlots.appendChild(btn);
     });
+    resTimeSelect._resSync?.();
   }
+
+  enhanceSelect(resParty);
+  enhanceSelect(resTimeSelect);
+  enhanceSelect(document.querySelector('.hightea-form select'));
 
   if (resDate) {
     const today = new Date();
