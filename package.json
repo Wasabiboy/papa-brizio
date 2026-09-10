@@ -1,0 +1,9 @@
+{
+  "name": "papa-brizio",
+  "private": true,
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "@netlify/functions": "^5.1.2",
+    "resend": "^6.9.1"
+  }
+}

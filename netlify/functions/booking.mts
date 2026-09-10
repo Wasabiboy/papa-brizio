@@ -1,6 +1,6 @@
 import type { Config } from "@netlify/functions";
-import { neon } from "@neondatabase/serverless";
 import { sendGuestMessage, sendStaffAlert } from "./_lib/mail";
+import { sqlClient } from "./_lib/db";
 import { env } from "./_lib/env";
 import { isValidSlot, settingsFromRow } from "./_lib/venue";
 
@@ -44,10 +44,10 @@ export default async (req: Request) => {
     return json(405, { error: "Use POST to send a booking." });
   }
 
-  const databaseUrl = env("DATABASE_URL");
   const resendKey = env("RESEND_API_KEY");
+  const sql = await sqlClient();
 
-  if (!databaseUrl) {
+  if (!sql) {
     return json(500, { error: "Bookings are not configured yet." });
   }
   if (!resendKey) {
@@ -87,7 +87,6 @@ export default async (req: Request) => {
     return json(400, { error: "Please choose a valid date and time." });
   }
 
-  const sql = neon(databaseUrl);
   try {
     const settingRows = await sql`SELECT timezone, slot_minutes, hours, closed_dates FROM venue_settings WHERE id = 'default' LIMIT 1`;
     const settings = settingsFromRow(settingRows[0] as Record<string, unknown> | undefined);

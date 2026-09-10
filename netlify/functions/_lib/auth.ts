@@ -51,7 +51,9 @@ export function isAuthed(req: Request) {
 }
 
 export function cookieHeader(req: Request, token?: string) {
-  const secure = new URL(req.url).protocol === "https:" ? "; Secure" : "";
+  const url = new URL(req.url);
+  const proto = (req.headers.get("x-forwarded-proto") || url.protocol.replace(":", "")).split(",")[0].trim();
+  const secure = proto === "https" ? "; Secure" : "";
   if (!token) {
     return `${COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`;
   }

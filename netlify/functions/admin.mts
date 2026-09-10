@@ -1,7 +1,6 @@
 import type { Config } from "@netlify/functions";
-import { neon } from "@neondatabase/serverless";
 import { cookieHeader, isAuthed, makeToken, passwordOk } from "./_lib/auth";
-import { env } from "./_lib/env";
+import { sqlClient } from "./_lib/db";
 import { sendGuestMessage, type BookingKind } from "./_lib/mail";
 import { DEFAULT_SETTINGS, isOpenOnDate, normalizeSettings, settingsFromRow } from "./_lib/venue";
 
@@ -29,12 +28,6 @@ function todayNz() {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
-}
-
-function sqlClient() {
-  const databaseUrl = env("DATABASE_URL");
-  if (!databaseUrl) return null;
-  return neon(databaseUrl);
 }
 
 export default async (req: Request) => {
@@ -67,7 +60,7 @@ export default async (req: Request) => {
     return json(401, { error: "Please sign in." });
   }
 
-  const sql = sqlClient();
+  const sql = await sqlClient();
   if (!sql) {
     return json(500, { error: "Database is not configured." });
   }
