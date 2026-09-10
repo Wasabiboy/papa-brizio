@@ -746,6 +746,10 @@
   }
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
+    nav.menu-open {
+      z-index: 2000;
+      background: var(--bg);
+    }
     .nav-logo img { height: 44px; }
     .nav-cta { display: none; }
     .nav-mobile { display: flex; position: relative; z-index: 110; }
@@ -758,8 +762,7 @@
       position: fixed;
       inset: 0;
       z-index: 105;
-      background: rgba(10, 9, 8, 0.96);
-      backdrop-filter: blur(16px);
+      background: var(--bg);
       padding: 6rem 2rem 2.5rem;
       opacity: 0;
       visibility: hidden;
@@ -1284,6 +1287,7 @@
   function setMobileMenu(open) {
     navLinks?.classList.toggle('open', open);
     navMobile?.classList.toggle('open', open);
+    nav?.classList.toggle('menu-open', open);
     navMobile?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     navMobile?.setAttribute('aria-expanded', open ? 'true' : 'false');
     document.body.style.overflow = open ? 'hidden' : '';
