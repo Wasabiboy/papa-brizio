@@ -86,7 +86,7 @@ export async function sendGuestMessage(data: BookingMail, mode: "request" | "con
   const key = env("RESEND_API_KEY");
   if (!key) return { ok: false, error: "Email sending is not configured yet." };
   const notifyEmail = env("BOOKING_NOTIFY_EMAIL") || "montrosecafe@xtra.co.nz";
-  const fromEmail = env("RESEND_FROM") || "Papa Brizio <onboarding@resend.dev>";
+  const fromEmail = env("RESEND_FROM") || "Papa Brizio <bookings@papabrizio.co.nz>";
   const copy = bookingEmail(data, mode);
   const resend = new Resend(key);
   const subject = mode === "confirmed"
@@ -116,7 +116,7 @@ export async function sendStaffAlert(data: BookingMail) {
   if (!key) return;
   const notifyEmail = env("BOOKING_NOTIFY_EMAIL") || "montrosecafe@xtra.co.nz";
   const testEmail = env("BOOKING_TEST_EMAIL");
-  const fromEmail = env("RESEND_FROM") || "Papa Brizio <onboarding@resend.dev>";
+  const fromEmail = env("RESEND_FROM") || "Papa Brizio <bookings@papabrizio.co.nz>";
   const copy = bookingEmail(data, "request");
   const resend = new Resend(key);
   const staffTo = [...new Set([notifyEmail, testEmail].filter(Boolean))];
