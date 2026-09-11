@@ -357,6 +357,27 @@
   .menu-item-name { font-family: var(--serif); font-size: 1.44rem; color: #fff; }
   .menu-item-desc { font-size: 0.96rem; color: #fff; opacity: 0.8; display: block; margin-top: 0.3rem; }
   .menu-item-price { font-family: var(--serif); font-size: 1.44rem; color: var(--gold); font-weight: 500; }
+  .menu-photos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+  .menu-photos figure { margin: 0; }
+  .menu-photos img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    display: block;
+  }
+  .menu-photos figcaption {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: var(--gold);
+    margin-top: 0.65rem;
+    text-align: center;
+  }
 
   /* ===== HIGH TEA ===== */
   .hightea { background: var(--bg-warm); overflow: hidden; }
@@ -781,6 +802,7 @@
     .hero-hours { font-size: 1.5rem; }
     section { padding: 5rem 1.5rem; }
     .story-grid, .menu-grid, .visit-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .menu-photos { grid-template-columns: 1fr 1fr; gap: 0.85rem; }
     .visit-map { min-height: 280px; }
     .visit-map iframe { min-height: 280px; }
     .exp-grid { grid-template-columns: 1fr; }
@@ -880,7 +902,7 @@
         </div>
       </div>
       <div class="exp-card reveal reveal-delay-1">
-        <img src="https://static.wixstatic.com/media/05f177_82f6630375474f0d82ff9595168cbd4e~mv2_d_6016_4016_s_4_2.jpg/v1/fill/w_600,h_800,q_90,enc_avif,quality_auto/05f177_82f6630375474f0d82ff9595168cbd4e~mv2_d_6016_4016_s_4_2.jpg" alt="Afternoon at Papà Brizio">
+        <img src="assets/images/papa-brizio-risotto.webp" alt="Bruschetta at Papà Brizio">
         <div class="exp-overlay">
           <div class="exp-title">Afternoon</div>
           <div class="exp-time">Afternoon at Papà Brizio · 12pm — 5pm</div>
@@ -888,7 +910,7 @@
         </div>
       </div>
       <div class="exp-card reveal reveal-delay-2">
-        <img src="https://static.wixstatic.com/media/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg/v1/fill/w_600,h_800,q_90,enc_avif,quality_auto/05f177_bfafdce1837f469580f14b49759ef711~mv2_d_5740_3832_s_4_2.jpg" alt="Evening at Papà Brizio">
+        <img src="assets/images/papa-brizio-pizza-2.webp" alt="Wood-fired pizza at Papà Brizio">
         <div class="exp-overlay">
           <div class="exp-title">Evening</div>
           <div class="exp-time">Evening at Papà Brizio · 5pm — 8pm</div>
@@ -910,6 +932,24 @@
         Place an order anytime — note the time you want to collect. Pay in-store or online.
         <span class="fine">This is our online-only menu. Please see our <a href="https://www.google.com/maps/search/?api=1&amp;query=Montrose+Cafe+Bistro+Bar+Mairangi+Bay" target="_blank" style="color:var(--gold);">Google listing photos</a> for the menu in store.</span>
       </p>
+    </div>
+    <div class="menu-photos reveal">
+      <figure>
+        <img src="assets/images/papa-brizio-pizza.webp" alt="Wood-fired pizza">
+        <figcaption>Wood-Fired Pizza</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/images/papa-brizio-pasta.webp" alt="House-made prawn pasta">
+        <figcaption>House-Made Pasta</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/images/papa-brizio-pasta-2.webp" alt="Baked pasta">
+        <figcaption>Baked Pasta</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/images/papa-brizio-lamb-shanks.webp" alt="House-made risotto">
+        <figcaption>Risotto</figcaption>
+      </figure>
     </div>
     <div class="menu-grid">
       <div class="menu-col reveal">
@@ -1357,16 +1397,22 @@
     'papa-brizio-high-tea-desserts-2.webp',
     'papa-brizio-iced-caramel-latte.webp',
     'papa-brizio-jalapeno-poppers.webp',
+    'papa-brizio-lamb-shanks.webp',
     'papa-brizio-lipton-iced-tea.webp',
     'papa-brizio-loaded-fries.webp',
     'papa-brizio-loaded-potato-wedges.webp',
     'papa-brizio-mini-quiches.webp',
     'papa-brizio-pan-fried-dumplings.webp',
     'papa-brizio-panna-cotta.webp',
+    'papa-brizio-pasta.webp',
+    'papa-brizio-pasta-2.webp',
+    'papa-brizio-pizza.webp',
+    'papa-brizio-pizza-2.webp',
     'papa-brizio-pork-belly-mash.webp',
     'papa-brizio-pork-belly-mash-2.webp',
     'papa-brizio-prawn-avocado-salad.webp',
     'papa-brizio-roast-beef-dinner.webp',
+    'papa-brizio-risotto.webp',
     'papa-brizio-scrambled-eggs-breakfast.webp',
     'papa-brizio-seafood-paella.webp',
     'papa-brizio-smoked-salmon-antipasto.webp',
@@ -1375,6 +1421,15 @@
     'papa-brizio-35.webp',
     'papa-brizio-39.webp'
   ];
+
+  const GALLERY_META = {
+    'papa-brizio-lamb-shanks.webp': { label: 'Risotto', category: 'mains' },
+    'papa-brizio-pasta.webp': { label: 'Prawn Pasta', category: 'mains' },
+    'papa-brizio-pasta-2.webp': { label: 'Baked Pasta', category: 'mains' },
+    'papa-brizio-pizza.webp': { label: 'Wood-Fired Pizza', category: 'mains' },
+    'papa-brizio-pizza-2.webp': { label: 'Wood-Fired Pizza', category: 'mains' },
+    'papa-brizio-risotto.webp': { label: 'Bruschetta', category: 'starters' }
+  };
 
   function slugFromFile(file) {
     return file.replace(/^papa-brizio-/, '').replace(/\.webp$/, '');
@@ -1403,12 +1458,12 @@
       .filter(f => !GALLERY_EXCLUDE.test(f))
       .map(file => {
         const slug = slugFromFile(file);
-        const category = categorizeFromSlug(slug);
+        const meta = GALLERY_META[file] || {};
         return {
           file,
           slug,
-          category,
-          label: labelFromSlug(slug),
+          category: meta.category || categorizeFromSlug(slug),
+          label: meta.label || labelFromSlug(slug),
           src: 'assets/images/' + file
         };
       });
