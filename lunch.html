@@ -927,6 +927,7 @@
   document.querySelectorAll('.reveal').forEach(element => revealObserver.observe(element));
 
   const categoryLinks = [...document.querySelectorAll('.category-nav a')];
+  const categoryNav = document.querySelector('.category-nav');
   const menuSections = categoryLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
   const sectionObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
@@ -934,7 +935,10 @@
       categoryLinks.forEach(link => {
         const active = link.getAttribute('href') === '#' + entry.target.id;
         link.classList.toggle('active', active);
-        if (active) link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        if (active && categoryNav) {
+          const targetLeft = link.offsetLeft - (categoryNav.clientWidth - link.offsetWidth) / 2;
+          categoryNav.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+        }
       });
     });
   }, { rootMargin: '-25% 0px -65% 0px', threshold: 0 });
