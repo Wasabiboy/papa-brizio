@@ -779,6 +779,12 @@
   .reveal-delay-3 { transition-delay: 0.45s; }
 
   /* ===== RESPONSIVE ===== */
+  @media (min-width: 901px) and (max-width: 1280px) {
+    nav { padding-inline: 1.5rem; }
+    .nav-links { gap: 1rem; }
+    .nav-links a { font-size: 0.76rem; letter-spacing: 0.08em; }
+    .nav-cta { display: none; }
+  }
   @media (min-width: 901px) {
     .menu-buttons { flex-direction: row !important; }
     .menu-buttons a { width: auto !important; max-width: none !important; }
@@ -855,7 +861,8 @@
   <ul class="nav-links">
     <li><a href="#story">Our Story</a></li>
     <li><a href="#experience">Experience</a></li>
-    <li><a href="#menu">Menu</a></li>
+    <li><a href="lunch.html">Lunch</a></li>
+    <li><a href="menu.html">Dinner</a></li>
     <li><a href="#hightea">High Tea</a></li>
     <li><a href="#reservations">Reservations</a></li>
     <li><a href="#gallery">Gallery</a></li>
@@ -877,7 +884,8 @@
     <p class="hero-sub">Where flavor, comfort & style meet in Mairangi Bay</p>
     <p class="hero-hours">Open Wednesday – Sunday · 8am – 8pm</p>
     <div class="hero-buttons">
-      <a href="#menu" class="btn-primary">View Menus</a>
+      <a href="lunch.html" class="btn-outline btn-lunch">Lunch Menu</a>
+      <a href="menu.html" class="btn-outline btn-dinner">Dinner Menu</a>
       <a href="#reservations" class="btn-outline">Book a Table</a>
     </div>
   </div>
@@ -1296,7 +1304,8 @@
         <h4>Explore</h4>
         <a href="#story">Our Story</a>
         <a href="#experience">Experience</a>
-        <a href="#menu">Menu</a>
+        <a href="lunch.html">Lunch Menu</a>
+        <a href="menu.html">Dinner Menu</a>
         <a href="#hightea">High Tea</a>
         <a href="#reservations">Reservations</a>
         <a href="#gallery">Gallery</a>
