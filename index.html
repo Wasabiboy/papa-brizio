@@ -235,6 +235,24 @@
     transition: all 0.3s;
   }
   .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-lunch {
+    border-color: #00a95b;
+    color: #70d49f;
+  }
+  .btn-lunch:hover {
+    border-color: #00a95b;
+    background: #00a95b;
+    color: #07170f;
+  }
+  .btn-dinner {
+    border-color: #d93a31;
+    color: #f08079;
+  }
+  .btn-dinner:hover {
+    border-color: #d93a31;
+    background: #d93a31;
+    color: #fffaf0;
+  }
   .hero-scroll {
     position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
     color: var(--cream-dim); font-size: 0.65rem;
@@ -859,7 +877,7 @@
     <p class="hero-sub">Where flavor, comfort & style meet in Mairangi Bay</p>
     <p class="hero-hours">Open Wednesday – Sunday · 8am – 8pm</p>
     <div class="hero-buttons">
-      <a href="menu.html" class="btn-primary">View Menu</a>
+      <a href="#menu" class="btn-primary">View Menus</a>
       <a href="#reservations" class="btn-outline">Book a Table</a>
     </div>
   </div>
@@ -928,8 +946,8 @@
       <div class="section-label">A Taste</div>
       <h2 class="section-title">From our <span class="italic">kitchen</span></h2>
       <p class="hours-note">
-        <strong>Dinner served from 3pm until late</strong><br>
-        Antipasto, Italian mains, pizza, pasta and risotto — with something sweet to finish.
+        <strong>Lunch 9am–3pm · Dinner from 3pm until late</strong><br>
+        From laid-back brunch plates to antipasto, Italian mains, pizza, pasta and risotto.
         <span class="fine">Please advise your waiter of any dietary requirements.</span>
       </p>
     </div>
@@ -1016,7 +1034,8 @@
       </div>
     </div>
     <div class="menu-buttons reveal" style="text-align:center;margin-top:3rem;display:flex;flex-direction:column;gap:1rem;align-items:center;">
-      <a href="menu.html" class="btn-outline" style="display:block;width:100%;max-width:280px;">View Dinner Menu</a>
+      <a href="lunch.html" class="btn-outline btn-lunch" style="display:block;width:100%;max-width:280px;">View Lunch Menu</a>
+      <a href="menu.html" class="btn-outline btn-dinner" style="display:block;width:100%;max-width:280px;">View Dinner Menu</a>
     </div>
   </div>
 </section>

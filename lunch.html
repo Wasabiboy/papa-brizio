@@ -3,23 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#1b1713">
-<title>Dinner Menu — Papà Brizio | Mairangi Bay</title>
-<meta name="description" content="Explore Papà Brizio's dinner menu, served from 3pm until late: antipasto, Italian mains, pizza, pasta, risotto, desserts and coffee in Mairangi Bay.">
+<meta name="theme-color" content="#1c1915">
+<title>Lunch Menu — Papà Brizio | Mairangi Bay</title>
+<meta name="description" content="Explore Papà Brizio's lunch menu, served from 9am to 3pm: brunch, Italian mains, 9-inch pizza, pasta, risotto, desserts and coffee in Mairangi Bay.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,ital,wght@6..96,400;6..96,500;6..96,600;6..96,700;6..96,400&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #1b1713;
-    --ink-soft: #2c241d;
-    --paper: #f3ecdd;
-    --paper-deep: #e5d8c2;
-    --red: #9f2d24;
-    --red-dark: #6d1d18;
-    --olive: #64704d;
-    --gold: #c4a266;
-    --muted: #74695d;
+    --ink: #1c1915;
+    --ink-soft: #2b2520;
+    --paper: #fffaf0;
+    --paper-deep: #f4dfbe;
+    --red: #d9322b;
+    --red-dark: #a9201d;
+    --olive: #087f4a;
+    --green: #009d55;
+    --green-dark: #006f3b;
+    --gold: #d7b78d;
+    --muted: #6f6257;
     --line: rgba(55, 43, 32, 0.2);
     --display: 'Bodoni Moda', Didot, Georgia, serif;
     --body: 'Karla', sans-serif;
@@ -105,12 +107,28 @@
   }
 
   .hero {
+    position: relative;
     min-height: 680px;
     display: grid;
     grid-template-columns: minmax(0, 1.12fr) minmax(340px, 0.88fr);
-    padding-top: 76px;
-    background: var(--ink);
+    padding-top: 100px;
+    background:
+      radial-gradient(circle at 8% 88%, rgba(0, 157, 85, 0.2), transparent 30%),
+      var(--ink);
     color: #fffaf0;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    z-index: 3;
+    inset: 76px 0 auto;
+    height: 24px;
+    background-color: #fffaf0;
+    background-image:
+      linear-gradient(45deg, var(--red) 25%, transparent 25%, transparent 75%, var(--red) 75%),
+      linear-gradient(45deg, var(--red) 25%, transparent 25%, transparent 75%, var(--red) 75%);
+    background-position: 0 0, 12px 12px;
+    background-size: 24px 24px;
   }
   .hero-copy {
     position: relative;
@@ -155,7 +173,7 @@
   .hero h1 em {
     display: block;
     margin-left: clamp(2.5rem, 8vw, 7rem);
-    color: var(--gold);
+    color: #31b66f;
     font-weight: 400;
   }
   .hero-intro {
@@ -168,7 +186,7 @@
   .hero-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; }
   .hero-meta span {
     padding: 0.55rem 0.8rem;
-    border: 1px solid rgba(196, 162, 102, 0.32);
+    border: 1px solid rgba(49, 182, 111, 0.48);
     color: #f3ecdd;
     font-size: 0.72rem;
     font-weight: 600;
@@ -222,7 +240,7 @@
     gap: 0.2rem;
     overflow-x: auto;
     padding: 0 2.5rem;
-    background: rgba(243, 236, 221, 0.96);
+    background: rgba(255, 250, 240, 0.96);
     border-bottom: 1px solid var(--line);
     scrollbar-width: none;
     backdrop-filter: blur(14px);
@@ -375,7 +393,8 @@
     padding: 6rem max(3rem, calc((100vw - 1160px) / 2));
     color: #fffaf0;
     background:
-      radial-gradient(circle at 84% 16%, rgba(196,162,102,0.13), transparent 27%),
+      radial-gradient(circle at 84% 16%, rgba(217,50,43,0.18), transparent 27%),
+      radial-gradient(circle at 8% 90%, rgba(0,157,85,0.16), transparent 30%),
       var(--ink);
   }
   .after-dinner-head {
@@ -456,7 +475,7 @@
     align-items: center;
     padding: 4rem max(3rem, calc((100vw - 1160px) / 2));
     color: #fffaf0;
-    background: var(--red-dark);
+    background: var(--green-dark);
   }
   .booking-band h2 {
     max-width: 800px;
@@ -479,7 +498,7 @@
     text-transform: uppercase;
     transition: 180ms ease;
   }
-  .booking-button:hover { color: var(--red-dark); background: #fffaf0; }
+  .booking-button:hover { color: var(--green-dark); background: #fffaf0; }
 
   footer {
     display: grid;
@@ -592,8 +611,8 @@
   </a>
   <ul class="nav-links" id="navLinks">
     <li><a href="index.html#story">Our Story</a></li>
-    <li><a href="lunch.html">Lunch</a></li>
-    <li><a href="menu.html" aria-current="page">Dinner</a></li>
+    <li><a href="lunch.html" aria-current="page">Lunch</a></li>
+    <li><a href="menu.html">Dinner</a></li>
     <li><a href="index.html#hightea">High Tea</a></li>
     <li><a href="index.html#visit">Visit</a></li>
   </ul>
@@ -606,22 +625,22 @@
 <header class="hero">
   <div class="hero-copy">
     <div class="eyebrow">Papà Brizio · Mairangi Bay</div>
-    <h1>Dinner <em>menu</em></h1>
-    <p class="hero-intro">An evening made for passing plates, twirling pasta and staying for one more espresso.</p>
+    <h1>Lunch <em>menu</em></h1>
+    <p class="hero-intro">Slow mornings, bright plates and Italian comfort — from the first espresso through to a late lunch.</p>
     <div class="hero-meta">
-      <span>Served 3pm — late</span>
-      <span>12" pizza</span>
-      <span>GF bases +$4</span>
+      <span>Served 9am — 3pm</span>
+      <span>9&quot; pizza</span>
+      <span>Dietary options available</span>
     </div>
   </div>
   <div class="hero-visual">
-    <img src="assets/images/papa-brizio-hero-background.webp" alt="Dinner at Papà Brizio">
+    <img src="assets/images/papa-brizio-cooked-breakfast.webp" alt="Lunch at Papà Brizio">
     <div class="hero-stamp">Buon<br>appetito!</div>
   </div>
 </header>
 
-<nav class="category-nav" aria-label="Dinner menu categories">
-  <a href="#antipasto">Antipasto</a>
+<nav class="category-nav" aria-label="Lunch menu categories">
+  <a href="#brunch">Brunch</a>
   <a href="#mains">Mains</a>
   <a href="#pizza">Pizza</a>
   <a href="#pasta">Pasta &amp; Risotto</a>
@@ -633,7 +652,7 @@
 <main>
   <div class="menu-shell">
     <aside class="menu-note reveal" aria-labelledby="dietary-title">
-      <h2 id="dietary-title">Made for the whole table.</h2>
+      <h2 id="dietary-title">Lunch, the Italian way.</h2>
       <div class="note-copy">
         <p>Please advise your waiter of any dietary requirements. Optional adaptations are marked beside each dish.</p>
         <div class="dietary-legend" aria-label="Dietary key">
@@ -645,46 +664,61 @@
       </div>
     </aside>
 
-    <section class="menu-section reveal" id="antipasto">
+    <section class="menu-section reveal" id="brunch">
       <div class="section-heading">
-        <div class="section-number">01 · To begin</div>
-        <h2>Antipasto</h2>
-        <p>Little plates and generous starters, made for passing around.</p>
+        <div class="section-number">01 · From 9am</div>
+        <h2>Brunch</h2>
+        <p>Breakfast favourites, generous plates and proper Italian coffee.</p>
       </div>
       <div class="menu-list">
         <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Antipasto Platter</h3><span class="item-dots"></span><span class="item-price">$48</span></div>
-          <p class="item-desc">Selection of cured meats, breads, olives and marinated vegetables. Serves four.</p>
-          <div class="item-tags"><span class="tag">DFIO</span><span class="item-note">Half size $27</span></div>
+          <div class="item-line"><h3 class="item-name">Brizio Breakfast</h3><span class="item-dots"></span><span class="item-price">$29</span></div>
+          <p class="item-desc">Eggs your way, bacon, Italian herbed tomato, hash, sautéed mushrooms, Italian sausage and toasted focaccia.</p>
+          <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span><span class="item-note">Half size $24</span></div>
         </article>
         <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Garlic Pizza Bread</h3><span class="item-dots"></span><span class="item-price">$14</span></div>
-          <p class="item-desc">Oven-baked with garlic butter and parsley. Serves two.</p>
-          <div class="item-tags"><span class="tag">DFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Parmesan Puffs <small>(8pc)</small></h3><span class="item-dots"></span><span class="item-price">$10</span></div>
-          <p class="item-desc">Crispy, airy puffs stuffed with baked parmesan.</p>
-          <div class="item-tags"><span class="tag">GFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Bruschetta</h3><span class="item-dots"></span><span class="item-price">$20</span></div>
-          <p class="item-desc">Toasted bread topped with fresh tomato, shaved cured meat, basil pesto and olive oil.</p>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Garlic Prawns &amp; Lemon Risotto</h3><span class="item-dots"></span><span class="item-price">$22 / $39</span></div>
-          <p class="item-desc">Sautéed prawns with garlic, arborio rice, lemon and parmesan.</p>
-          <div class="item-tags"><span class="tag">GFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Spicy Squid Salad</h3><span class="item-dots"></span><span class="item-price">$22</span></div>
-          <p class="item-desc">Crispy squid tossed in a fresh lime-chilli Tuscan herb salad.</p>
+          <div class="item-line"><h3 class="item-name">Baked Eggs</h3><span class="item-dots"></span><span class="item-price">$26</span></div>
+          <p class="item-desc">Eggs baked in spiced herb tomato and chorizo, served with toasted focaccia.</p>
           <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
         </article>
         <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Mixed Olives</h3><span class="item-dots"></span><span class="item-price">$14</span></div>
-          <p class="item-desc">Marinated green and black olives with herbs, garlic and citrus zest, served with focaccia.</p>
+          <div class="item-line"><h3 class="item-name">Orticello</h3><span class="item-dots"></span><span class="item-price">$27</span></div>
+          <p class="item-desc">Hash browns, veggie fritters, Italian herbed tomato, sautéed spinach and mushrooms, with focaccia.</p>
+          <div class="item-tags"><span class="tag">V</span><span class="tag">VGO</span><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
+        </article>
+        <article class="menu-item">
+          <div class="item-line"><h3 class="item-name">Avocado Stack</h3><span class="item-dots"></span><span class="item-price">$27</span></div>
+          <p class="item-desc">Avocado smashed with chilli, lime and red onion, served with rosti, cold-smoked salmon and a poached egg.</p>
           <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
+        </article>
+        <article class="menu-item">
+          <div class="item-line"><h3 class="item-name">Waffles</h3><span class="item-dots"></span><span class="item-price">$26</span></div>
+          <p class="item-desc">Fresh banana, bacon and espresso-infused maple syrup.</p>
+        </article>
+        <article class="menu-item">
+          <div class="item-line"><h3 class="item-name">Mince on Focaccia</h3><span class="item-dots"></span><span class="item-price">$26</span></div>
+          <p class="item-desc">Savoury beef mince on toasted focaccia, topped with two poached eggs.</p>
+          <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
+        </article>
+        <article class="menu-item">
+          <div class="item-line"><h3 class="item-name">3-Egg Omelette</h3><span class="item-dots"></span><span class="item-price">$27</span></div>
+          <p class="item-desc">Served with salad and toasted Italian herb bread. Choose two: mushrooms, tomato, bacon or cheese.</p>
+          <div class="item-tags"><span class="tag">GFIO</span></div>
+        </article>
+        <article class="menu-item">
+          <div class="item-line"><h3 class="item-name">Bacon &amp; Eggs</h3><span class="item-dots"></span><span class="item-price">$22</span></div>
+          <p class="item-desc">Eggs your way with crispy bacon and two slices of toasted Tuscan bread.</p>
+          <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
+        </article>
+        <article class="menu-item">
+          <div class="item-line"><h3 class="item-name">Open Grilled Cheese</h3><span class="item-dots"></span><span class="item-price">$17</span></div>
+          <p class="item-desc">Baked focaccia topped with bacon, spinach, onion, tomato, sun-dried tomato and mozzarella.</p>
+          <div class="item-tags"><span class="tag">GFIO</span><span class="item-note">Half size $8.50</span></div>
+        </article>
+        <article class="menu-item">
+          <div class="item-line"><h3 class="item-name">Brisket Open Focaccia</h3><span class="item-dots"></span><span class="item-price">$16.50</span></div>
+          <p class="item-desc">Beef brisket slow-cooked for up to 18 hours, lettuce, avocado, tomato and sun-dried tomato pesto, with aioli.</p>
+          <div class="item-tags"><span class="tag">GFIO</span><span class="item-note">Add fries +$5</span></div>
         </article>
       </div>
     </section>
@@ -693,35 +727,31 @@
       <div class="section-heading">
         <div class="section-number">02 · From the kitchen</div>
         <h2>Mains</h2>
-        <p>Comforting classics, thoughtful produce and Italian soul.</p>
+        <p>Fresh, generous plates made for an unhurried afternoon.</p>
       </div>
       <div class="menu-list">
         <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Chicken Parmigiana</h3><span class="item-dots"></span><span class="item-price">$39</span></div>
-          <p class="item-desc">Napolitana sauce and mozzarella, baked until golden and served with waffle fries and salad.</p>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Surf n’ Turf</h3><span class="item-dots"></span><span class="item-price">$54</span></div>
-          <p class="item-desc">180g aged eye fillet steak crowned with prawns, served on a herb rosti with vegetables and béarnaise sauce.</p>
-          <div class="item-tags"><span class="tag">GFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Catch of the Day</h3><span class="item-dots"></span><span class="item-price">$42</span></div>
-          <p class="item-desc">Fresh fish fillet cooked your way, served with golden fries and garden salad.</p>
+          <div class="item-line"><h3 class="item-name">Catch of the Day</h3><span class="item-dots"></span><span class="item-price">$34</span></div>
+          <p class="item-desc">Fresh fish fillets cooked your way, served with golden fries, salad, house-made tartare and lemon.</p>
           <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
         </article>
         <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Braised Lamb Shank</h3><span class="item-dots"></span><span class="item-price">$46</span></div>
-          <p class="item-desc">Italian slow-braised lamb over creamy mashed potatoes, with seasonal vegetables and thyme-infused jus.</p>
+          <div class="item-line"><h3 class="item-name">Scotch Fillet Steak</h3><span class="item-dots"></span><span class="item-price">$42</span></div>
+          <p class="item-desc">250g aged Scotch fillet steak with golden fries, side salad and mushroom sauce.</p>
           <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
         </article>
         <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Mama’s Meatballs</h3><span class="item-dots"></span><span class="item-price">$37</span></div>
-          <p class="item-desc">100% pure New Zealand beef, seared and served in marinara sauce atop creamy mash.</p>
+          <div class="item-line"><h3 class="item-name">Caesar Salad</h3><span class="item-dots"></span><span class="item-price">$33</span></div>
+          <p class="item-desc">Crisp romaine lettuce, bacon, anchovies, croutons and parmesan, topped with a poached egg.</p>
+          <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span><span class="item-note">Add chicken +$5</span></div>
+        </article>
+        <article class="menu-item">
+          <div class="item-line"><h3 class="item-name">Prawn &amp; Mango Salad</h3><span class="item-dots"></span><span class="item-price">$33</span></div>
+          <p class="item-desc">Juicy prawns and ripe mango tossed with iceberg lettuce and red onion, with a zesty lemon finish.</p>
           <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
         </article>
         <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Mediterranean Lamb Salad</h3><span class="item-dots"></span><span class="item-price">$35</span></div>
+          <div class="item-line"><h3 class="item-name">Mediterranean Lamb Salad</h3><span class="item-dots"></span><span class="item-price">$33</span></div>
           <p class="item-desc">Spiced lamb with olives, feta, sun-dried and fresh tomatoes, cucumber and baby leaves.</p>
           <div class="item-tags"><span class="tag">GFIO</span></div>
         </article>
@@ -730,41 +760,21 @@
 
     <div class="photo-break reveal" aria-hidden="true">
       <img src="assets/images/papa-brizio-pizza-2.webp" alt="">
-      <div class="photo-break-copy"><p>Fire, flour, patience — and a table to share it at.</p></div>
+      <div class="photo-break-copy"><p>A little taste of Italy, right by the bay.</p></div>
     </div>
 
     <section class="menu-section reveal" id="pizza">
       <div class="section-heading">
         <div class="section-number">03 · From the oven</div>
-        <h2>Pizza <span aria-hidden="true">12"</span></h2>
-        <p>All pizzas are twelve inches. Gluten-free base available for $4.</p>
+        <h2>Pizza <span aria-hidden="true">9&quot;</span></h2>
+        <p>Personal nine-inch pizzas, baked until crisp and bubbling.</p>
       </div>
       <div class="menu-list">
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">The Papa Brizio</h3><span class="item-dots"></span><span class="item-price">$34</span></div>
-          <p class="item-desc">Italian sausage, salami, prosciutto, mozzarella and capsicum.</p>
-          <div class="item-tags"><span class="tag">GFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">The Big Smoke</h3><span class="item-dots"></span><span class="item-price">$32</span></div>
-          <p class="item-desc">Slow-cooked beef brisket, chipotle sauce and caramelised onion.</p>
-          <div class="item-tags"><span class="tag">GFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">The Atlantic Catch</h3><span class="item-dots"></span><span class="item-price">$34</span></div>
-          <p class="item-desc">Smoked salmon, feta, capers and fresh herbs.</p>
-          <div class="item-tags"><span class="tag">GFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">The Coney Island Chicken</h3><span class="item-dots"></span><span class="item-price">$32</span></div>
-          <p class="item-desc">Chicken, smoked bacon, camembert and cranberry sauce.</p>
-          <div class="item-tags"><span class="tag">GFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">The Bella Verde</h3><span class="item-dots"></span><span class="item-price">$29</span></div>
-          <p class="item-desc">Mushrooms, onion, tomato, olives and basil.</p>
-          <div class="item-tags"><span class="tag">GFIO</span></div>
-        </article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">The Papa Brizio</h3><span class="item-dots"></span><span class="item-price">$25</span></div><p class="item-desc">Italian sausage, salami, prosciutto, mozzarella and capsicum.</p></article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">The Big Smoke</h3><span class="item-dots"></span><span class="item-price">$25</span></div><p class="item-desc">Slow-cooked beef brisket, spicy chipotle sauce and caramelised onion.</p></article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">The Atlantic Catch</h3><span class="item-dots"></span><span class="item-price">$25</span></div><p class="item-desc">Smoked salmon, feta, capers and fresh herbs.</p></article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">The Coney Island Chicken</h3><span class="item-dots"></span><span class="item-price">$25</span></div><p class="item-desc">Chicken, bacon, camembert and cranberry sauce.</p></article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">The Bella Verde</h3><span class="item-dots"></span><span class="item-price">$25</span></div><p class="item-desc">Mushrooms, onion, tomato, olives and basil.</p></article>
       </div>
     </section>
 
@@ -772,48 +782,15 @@
       <div class="section-heading">
         <div class="section-number">04 · Italian comfort</div>
         <h2>Pasta &amp; Risotto</h2>
-        <p>Silky sauces, creamy arborio and generous bowls made for slow evenings.</p>
+        <p>Silky sauces, creamy arborio and the kind of bowls worth lingering over.</p>
       </div>
       <div class="menu-list">
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Fettuccine della Casa</h3><span class="item-dots"></span><span class="item-price">$35</span></div>
-          <p class="item-desc">Chicken, bacon and mushrooms in a creamy herb sauce.</p>
-          <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">The Big Easy Rigatoni</h3><span class="item-dots"></span><span class="item-price">$35</span></div>
-          <p class="item-desc">Chicken, chorizo and prawns tossed in a Cajun-spiced cream sauce.</p>
-          <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Linguine al Mare</h3><span class="item-dots"></span><span class="item-price">$36</span></div>
-          <p class="item-desc">Lightly tossed linguine with fresh prawns, capers, lemon zest and olive oil.</p>
-          <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Ravioli al Blu</h3><span class="item-dots"></span><span class="item-price">$35</span></div>
-          <p class="item-desc">Spinach and ricotta ravioli in a blue cheese cream, finished with roasted pine nuts.</p>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Classic Ragù Lasagna</h3><span class="item-dots"></span><span class="item-price">$34</span></div>
-          <p class="item-desc">Beef mince and sautéed onion with Napolitana sauce and baked mozzarella.</p>
-          <div class="item-tags"><span class="tag">GFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Nonna’s Garden Lasagna</h3><span class="item-dots"></span><span class="item-price">$34</span></div>
-          <p class="item-desc">Layers of roasted garden vegetables, baked spinach, pumpkin and ricotta.</p>
-          <div class="item-tags"><span class="tag">V</span><span class="tag">GFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Risotto della Costa</h3><span class="item-dots"></span><span class="item-price">$39</span></div>
-          <p class="item-desc">House-smoked salmon and spinach with creamy arborio rice, lemon and parmesan.</p>
-          <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
-        </article>
-        <article class="menu-item">
-          <div class="item-line"><h3 class="item-name">Risotto dell’Orto</h3><span class="item-dots"></span><span class="item-price">$37</span></div>
-          <p class="item-desc">Sautéed spinach, tomato and mushroom stirred through creamy arborio rice, served with parmesan.</p>
-          <div class="item-tags"><span class="tag">V</span><span class="tag">VGO</span><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
-        </article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">Fettuccine della Casa</h3><span class="item-dots"></span><span class="item-price">$32</span></div><p class="item-desc">Chicken, bacon, mushrooms and garlic with fettuccine in a creamy herb sauce.</p><div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div></article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">The Big Easy Rigatoni</h3><span class="item-dots"></span><span class="item-price">$32</span></div><p class="item-desc">Sautéed chicken, chorizo and prawns with rigatoni in a Cajun-spiced cream sauce.</p><div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div></article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">Classic Ragù Lasagna</h3><span class="item-dots"></span><span class="item-price">$33</span></div><p class="item-desc">Papa’s grass-fed beef mince layered with cheese, Napoletana sauce and mozzarella.</p><div class="item-tags"><span class="tag">GFIO</span></div></article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">Nonna’s Garden Lasagna</h3><span class="item-dots"></span><span class="item-price">$33</span></div><p class="item-desc">Layered roasted garden vegetables with baked spinach, pumpkin and ricotta.</p><div class="item-tags"><span class="tag">V</span><span class="tag">GFIO</span></div></article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">Risotto della Costa</h3><span class="item-dots"></span><span class="item-price">$35</span></div><p class="item-desc">House-smoked salmon and spinach with creamy arborio rice, topped with lemon and parmesan.</p><div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div></article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">Risotto dell’Orto</h3><span class="item-dots"></span><span class="item-price">$33</span></div><p class="item-desc">Sautéed spinach, tomato and mushroom with creamy arborio rice, served with parmesan.</p><div class="item-tags"><span class="tag">V</span><span class="tag">VGO</span><span class="tag">GFIO</span><span class="tag">DFIO</span></div></article>
       </div>
     </section>
 
@@ -821,13 +798,13 @@
       <div class="section-heading">
         <div class="section-number">05 · For the table</div>
         <h2>Sides</h2>
-        <p>A little extra—best ordered for everyone.</p>
+        <p>A little extra — best ordered for everyone.</p>
       </div>
       <div class="sides-grid menu-list">
         <article class="menu-item"><div class="item-line"><h3 class="item-name">Fries</h3><span class="item-dots"></span><span class="item-price">$11.50</span></div></article>
         <article class="menu-item"><div class="item-line"><h3 class="item-name">Crumbed Cauli</h3><span class="item-dots"></span><span class="item-price">$7.50</span></div></article>
         <article class="menu-item"><div class="item-line"><h3 class="item-name">Kumara Fries</h3><span class="item-dots"></span><span class="item-price">$11.50</span></div></article>
-        <article class="menu-item"><div class="item-line"><h3 class="item-name">Polenta Chips</h3><span class="item-dots"></span><span class="item-price">$11.50</span></div></article>
+        <article class="menu-item"><div class="item-line"><h3 class="item-name">Polenta Chips</h3><span class="item-dots"></span><span class="item-price">$8</span></div></article>
         <article class="menu-item"><div class="item-line"><h3 class="item-name">Waffle Fries</h3><span class="item-dots"></span><span class="item-price">$11.50</span></div></article>
         <article class="menu-item"><div class="item-line"><h3 class="item-name">Seasonal Veggies</h3><span class="item-dots"></span><span class="item-price">$7</span></div></article>
         <article class="menu-item"><div class="item-line"><h3 class="item-name">Loaded Wedges</h3><span class="item-dots"></span><span class="item-price">$18</span></div></article>
@@ -849,36 +826,11 @@
           <p>House favourites and classic Italian finishes.</p>
         </div>
         <div class="menu-list">
-          <article class="menu-item">
-            <div class="item-line"><h3 class="item-name">Limoncello Cheesecake</h3><span class="item-dots"></span><span class="item-price">$17</span></div>
-            <p class="item-desc">House-made cheesecake infused with limoncello, served with cream.</p>
-            <div class="item-tags"><span class="tag">GFIO</span></div>
-          </article>
-          <article class="menu-item">
-            <div class="item-line"><h3 class="item-name">Tiramisù della Casa</h3><span class="item-dots"></span><span class="item-price">$15</span></div>
-            <p class="item-desc">Classic house-made tiramisù with espresso-soaked sponge, mascarpone and cocoa.</p>
-            <div class="item-tags"><span class="tag">GFIO</span></div>
-          </article>
-          <article class="menu-item">
-            <div class="item-line"><h3 class="item-name">Chef’s Gelato Selection</h3><span class="item-dots"></span><span class="item-price">$17</span></div>
-            <p class="item-desc">A selection of three gelato flavours. Please ask your server about today’s selection.</p>
-            <div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div>
-          </article>
-          <article class="menu-item">
-            <div class="item-line"><h3 class="item-name">Date Pudding al Butterscotch</h3><span class="item-dots"></span><span class="item-price">$15</span></div>
-            <p class="item-desc">Sticky date and pear pudding layered with warm butterscotch sauce and cream.</p>
-            <div class="item-tags"><span class="tag">GFIO</span></div>
-          </article>
-          <article class="menu-item">
-            <div class="item-line"><h3 class="item-name">Affogato al Caffè</h3><span class="item-dots"></span><span class="item-price">$19</span></div>
-            <p class="item-desc">Espresso over vanilla ice cream with coconut amaretti, cream and chocolate. <span class="liqueur-choice">Choose Baileys, Kahlúa, Amaretto or Frangelico.</span></p>
-            <div class="item-tags"><span class="tag">GFIO</span></div>
-          </article>
-          <article class="menu-item">
-            <div class="item-line"><h3 class="item-name">Chocolate &amp; Butterscotch Brownie</h3><span class="item-dots"></span><span class="item-price">$16</span></div>
-            <p class="item-desc">With vanilla ice cream, cream and chocolate sauce.</p>
-            <div class="item-tags"><span class="tag">GFIO</span></div>
-          </article>
+          <article class="menu-item"><div class="item-line"><h3 class="item-name">Limoncello Cheesecake</h3><span class="item-dots"></span><span class="item-price">$16</span></div><p class="item-desc">House-made cheesecake infused with limoncello, served with cream.</p><div class="item-tags"><span class="tag">GFIO</span></div></article>
+          <article class="menu-item"><div class="item-line"><h3 class="item-name">Tiramisù della Casa</h3><span class="item-dots"></span><span class="item-price">$18</span></div><p class="item-desc">Classic house-made tiramisù with espresso-soaked sponge, mascarpone and cocoa.</p><div class="item-tags"><span class="tag">GFIO</span></div></article>
+          <article class="menu-item"><div class="item-line"><h3 class="item-name">Chef’s Gelato Selection</h3><span class="item-dots"></span><span class="item-price">$18</span></div><p class="item-desc">A selection of three gelato flavours. Please ask your server about today’s selection.</p><div class="item-tags"><span class="tag">GFIO</span><span class="tag">DFIO</span></div></article>
+          <article class="menu-item"><div class="item-line"><h3 class="item-name">Date Pudding al Butterscotch</h3><span class="item-dots"></span><span class="item-price">$15</span></div><p class="item-desc">Sticky date and pear pudding layered with warm butterscotch sauce and cream.</p><div class="item-tags"><span class="tag">GFIO</span></div></article>
+          <article class="menu-item"><div class="item-line"><h3 class="item-name">Affogato al Caffè</h3><span class="item-dots"></span><span class="item-price">$20</span></div><p class="item-desc">Espresso poured over vanilla ice cream with coconut amaretti, cream and chocolate sauce. <span class="liqueur-choice">Choose Baileys, Kahlúa, Amaretto or Frangelico.</span></p><div class="item-tags"><span class="tag">GFIO</span></div></article>
         </div>
       </section>
 
@@ -909,19 +861,16 @@
           </div>
           <div class="specials-list">
             <article class="menu-item"><div class="item-line"><h3 class="item-name">Baileys Hot Chocolate</h3><span class="item-dots"></span><span class="item-price">$17</span></div></article>
-            <article class="menu-item"><div class="item-line"><h3 class="item-name">Gingerbread Latte</h3><span class="item-dots"></span><span class="item-price">$7.50</span></div></article>
-            <article class="menu-item"><div class="item-line"><h3 class="item-name">Nutella Hot Chocolate</h3><span class="item-dots"></span><span class="item-price">$7.50</span></div></article>
-            <article class="menu-item">
-              <div class="item-line"><h3 class="item-name">Special Coffee</h3><span class="item-dots"></span><span class="item-price">$17</span></div>
-              <p class="item-desc">Irish Whiskey, Amaretto, Brandy, Tia Maria, Kahlúa, Galliano, Cointreau, Grand Marnier, Frangelico, Baileys, Drambuie, Glayva or Spiced Rum.</p>
-            </article>
+            <article class="menu-item"><div class="item-line"><h3 class="item-name">Gingerbread Latte</h3><span class="item-dots"></span><span class="item-price">$9</span></div></article>
+            <article class="menu-item"><div class="item-line"><h3 class="item-name">Nutella Hot Chocolate</h3><span class="item-dots"></span><span class="item-price">$9</span></div></article>
+            <article class="menu-item"><div class="item-line"><h3 class="item-name">Special Coffee</h3><span class="item-dots"></span><span class="item-price">$17</span></div><p class="item-desc">Irish Whiskey, Amaretto, Brandy, Tia Maria, Kahlúa, Galliano, Cointreau, Grand Marnier, Frangelico, Baileys, Drambuie, Glayva or Spiced Rum.</p></article>
           </div>
           <div class="digestivi">
-            <h3>Digestivi · $13 each</h3>
+            <h3>Digestivi · $12 each</h3>
             <div class="digestivi-grid">
               <p class="digestivo"><strong>Limoncello</strong>Chilled Italian lemon liqueur, bright and refreshing.</p>
               <p class="digestivo"><strong>Amaretto</strong>Smooth almond liqueur with a warm, sweet finish.</p>
-              <p class="digestivo"><strong>Frangelico</strong>Hazelnut liqueur with notes of vanilla and spice.</p>
+              <p class="digestivo"><strong>Frangelico</strong>Rich hazelnut liqueur with notes of vanilla and spice.</p>
               <p class="digestivo"><strong>Sambuca</strong>Classic aniseed liqueur, spiced black liquorice with a warm, sugary finish.</p>
               <p class="digestivo"><strong>Baileys</strong>Creamy Irish liqueur with hints of chocolate and vanilla.</p>
               <p class="digestivo"><strong>Kahlúa</strong>Coffee liqueur with deep, roasted sweetness.</p>
@@ -936,7 +885,7 @@
 <section class="booking-band">
   <div>
     <h2>Your table is waiting.</h2>
-    <p>Dinner served from 3pm until late at 1 Montrose Terrace, Mairangi Bay.</p>
+    <p>Lunch served from 9am to 3pm at 1 Montrose Terrace, Mairangi Bay.</p>
   </div>
   <a href="index.html#reservations" class="booking-button">Book a Table</a>
 </section>
