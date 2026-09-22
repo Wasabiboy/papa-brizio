@@ -64,7 +64,12 @@
   .pill.cancelled { color: var(--muted); border: 1px solid var(--border); }
   .pill.completed { color: var(--cream); border: 1px solid var(--border); }
   .layout { display: grid; grid-template-columns: 1.3fr .9fr; gap: 1.25rem; align-items: start; }
-  .hours-row { display: grid; grid-template-columns: 7.5rem 5rem 1fr 1fr; gap: .75rem; align-items: end; margin-bottom: .75rem; }
+  .hours-row { display: grid; grid-template-columns: 7.5rem 7.5rem 1fr 1fr; gap: .75rem; align-items: end; margin-bottom: .75rem; padding: .65rem; border: 1px solid transparent; }
+  .hours-row.is-closed { border-color: var(--border); background: rgba(0,0,0,.18); }
+  .hours-row.is-closed input[type="time"] { opacity: .45; }
+  .day-closed-wrap { display: flex; align-items: center; gap: .55rem; min-height: 2.7rem; }
+  .day-closed-wrap input { width: auto; margin: 0; }
+  .hours-summary { margin: 0 0 1rem; color: var(--gold); font-family: var(--serif); font-size: 1.2rem; }
   .closed-list { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
   .chip { border: 1px solid var(--border); padding: .35rem .6rem; display: flex; gap: .5rem; align-items: center; }
   .chip button { background: none; border: 0; color: var(--err); cursor: pointer; }
@@ -223,7 +228,8 @@
     <section id="hoursPanel" hidden>
       <form class="card" id="hoursForm">
         <h2 class="brand" style="font-size:1.6rem;margin-bottom:.4rem">Opening hours</h2>
-        <p class="sub" style="margin-bottom:1.25rem">These hours drive the public booking calendar. Close a day or change times, then save.</p>
+        <p class="sub" style="margin-bottom:1.25rem">These hours drive the public booking calendar. Tick <strong>Closed</strong> for days you are not open, then save. Closed days stay closed until you untick them and set times.</p>
+        <p class="hours-summary" id="hoursSummary"></p>
         <div style="max-width:220px;margin-bottom:1.25rem">
           <label for="slotMinutes">Time slot size</label>
           <select id="slotMinutes">
@@ -447,6 +453,7 @@
       btn.addEventListener("click", () => {
         closedDates = closedDates.filter((d) => d !== date);
         renderClosed();
+        renderHoursSummary();
       });
       chip.append(label, btn);
       list.appendChild(chip);
@@ -460,11 +467,57 @@
         weekday: Number(row.dataset.weekday),
         label: row.dataset.label,
         closed,
-        open: closed ? null : row.querySelector(".day-open").value || null,
-        lastSlot: closed ? null : row.querySelector(".day-last").value || null
+        open: closed ? null : row.querySelector(".day-open").value || "08:00",
+        lastSlot: closed ? null : row.querySelector(".day-last").value || "20:00"
       };
     });
     return { timezone: "Pacific/Auckland", slotMinutes: Number(document.getElementById("slotMinutes").value), hours, closedDates };
+  }
+
+  function syncHoursRow(row) {
+    const closed = row.querySelector(".day-closed").checked;
+    const open = row.querySelector(".day-open");
+    const last = row.querySelector(".day-last");
+    row.classList.toggle("is-closed", closed);
+    open.disabled = closed;
+    last.disabled = closed;
+    if (!closed) {
+      if (!open.value) open.value = "08:00";
+      if (!last.value) last.value = "20:00";
+    }
+  }
+
+  function renderHoursSummary(hours) {
+    const days = hours || [...document.querySelectorAll(".hours-row")].map((row) => ({
+      label: row.dataset.label,
+      closed: row.querySelector(".day-closed").checked
+    }));
+    const open = days.filter((day) => !day.closed).map((day) => day.label);
+    const closed = days.filter((day) => day.closed).map((day) => day.label);
+    const extra = closedDates.length ? " · Extra closed dates: " + closedDates.length : "";
+    document.getElementById("hoursSummary").textContent =
+      (open.length ? "Open " + open.join(", ") : "No open days") +
+      (closed.length ? " · Closed " + closed.join(", ") : "") +
+      extra;
+  }
+
+  function bindHoursRow(row, day) {
+    row.className = "hours-row";
+    row.dataset.weekday = day.weekday;
+    row.dataset.label = day.label;
+    row.innerHTML = '<div><label>Day</label><input class="day-label" disabled></div>' +
+      '<div><label>Closed all day</label><div class="day-closed-wrap"><input class="day-closed" type="checkbox"><span>Closed</span></div></div>' +
+      '<div><label>Opens</label><input class="day-open" type="time"></div>' +
+      '<div><label>Last seating</label><input class="day-last" type="time"></div>';
+    row.querySelector(".day-label").value = day.label;
+    row.querySelector(".day-closed").checked = Boolean(day.closed);
+    row.querySelector(".day-open").value = day.open || "";
+    row.querySelector(".day-last").value = day.lastSlot || "";
+    row.querySelector(".day-closed").addEventListener("change", () => {
+      syncHoursRow(row);
+      renderHoursSummary();
+    });
+    syncHoursRow(row);
   }
 
   async function loadHours() {
@@ -475,20 +528,11 @@
     box.replaceChildren();
     (data.hours || []).forEach((day) => {
       const row = document.createElement("div");
-      row.className = "hours-row";
-      row.dataset.weekday = day.weekday;
-      row.dataset.label = day.label;
-      row.innerHTML = '<div><label>Day</label><input class="day-label" disabled></div>' +
-        '<div><label>Closed</label><input class="day-closed" type="checkbox" style="width:auto;margin-top:.7rem"></div>' +
-        '<div><label>Opens</label><input class="day-open" type="time"></div>' +
-        '<div><label>Last seating</label><input class="day-last" type="time"></div>';
-      row.querySelector(".day-label").value = day.label;
-      row.querySelector(".day-closed").checked = Boolean(day.closed);
-      row.querySelector(".day-open").value = day.open || "";
-      row.querySelector(".day-last").value = day.lastSlot || "";
+      bindHoursRow(row, day);
       box.appendChild(row);
     });
     renderClosed();
+    renderHoursSummary(data.hours || []);
   }
 
   document.getElementById("addClosed").addEventListener("click", () => {
@@ -497,6 +541,7 @@
       closedDates.push(value);
       closedDates.sort();
       renderClosed();
+      renderHoursSummary();
     }
   });
 
@@ -506,7 +551,8 @@
     try {
       setStatus(status, "Saving…");
       await api("/api/admin/hours", { method: "POST", body: JSON.stringify(hoursPayload()) });
-      setStatus(status, "Hours saved. The public booking form will use these next time it loads.", "ok");
+      await loadHours();
+      setStatus(status, "Hours saved. Closed days stay closed on the public booking calendar.", "ok");
     } catch (err) {
       setStatus(status, err.message, "err");
     }

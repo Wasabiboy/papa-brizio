@@ -556,6 +556,14 @@
     font-size: 0.9rem; color: var(--cream-dim); margin-top: 1rem; font-style: italic;
   }
   .res-closed { color: var(--gold); }
+  .res-day-hint {
+    margin-top: 0.45rem;
+    font-size: 0.82rem;
+    color: var(--cream-dim);
+    font-style: italic;
+    min-height: 1.2em;
+  }
+  .res-day-hint.is-closed { color: var(--gold); }
   .form-status.ok { color: var(--gold); font-style: normal; }
   .form-status.error { color: #e8a0a0; font-style: normal; }
   .btn-primary:disabled { opacity: 0.55; cursor: wait; }
@@ -1138,6 +1146,7 @@
             <div>
               <label for="htDate">Date *</label>
               <input id="htDate" type="date" required>
+              <p class="res-closed" id="htClosed" hidden style="margin-top:0.6rem">We’re closed on this day. Please choose another day, or call 09 478 9610.</p>
             </div>
             <div>
               <label for="htTime">Time *</label>
@@ -1198,6 +1207,7 @@
         <div class="res-field">
           <label for="resDate">Date</label>
           <input type="date" id="resDate">
+          <p class="res-day-hint" id="resDayHint">Loading opening hours…</p>
         </div>
         <div class="res-field">
           <label for="resTimeSelect">Time</label>
@@ -1692,20 +1702,27 @@
   let venueHours = null;
   let slotMinutes = 15;
   let closedDates = [];
+  let hoursReady = false;
+  const resDayHint = document.getElementById('resDayHint');
 
-  function hoursForDate(iso) {
-    if (closedDates.includes(iso)) return null;
+  function dayRow(iso) {
+    if (!iso) return null;
+    if (closedDates.includes(iso)) return { closed: true, label: 'Extra closed date', open: null, lastSlot: null };
     const day = new Date(iso + 'T12:00:00').getDay(); // 0 Sun … 6 Sat
     if (Array.isArray(venueHours)) {
-      const row = venueHours.find(h => Number(h.weekday) === day);
-      if (!row || row.closed || !row.open || !row.lastSlot) return null;
-      const start = toMinutes(row.open);
-      const end = toMinutes(row.lastSlot);
-      if (start == null || end == null) return null;
-      return { start, end };
+      return venueHours.find(h => Number(h.weekday) === day) || null;
     }
-    if (day === 1 || day === 2) return null;
-    return { start: 8 * 60, end: 20 * 60 };
+    if (day === 1 || day === 2) return { closed: true, label: '', open: null, lastSlot: null };
+    return { closed: false, label: '', open: '08:00', lastSlot: '20:00' };
+  }
+
+  function hoursForDate(iso) {
+    const row = dayRow(iso);
+    if (!row || row.closed || !row.open || !row.lastSlot) return null;
+    const start = toMinutes(row.open);
+    const end = toMinutes(row.lastSlot);
+    if (start == null || end == null) return null;
+    return { start, end };
   }
 
   function slotsForDate(iso) {
@@ -1718,13 +1735,52 @@
   }
 
   function nextOpenDate(from) {
-    const d = new Date(from);
+    const d = new Date(from + 'T12:00:00');
+    if (Number.isNaN(d.getTime())) return from;
     for (let i = 0; i < 90; i++) {
       const iso = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
       if (hoursForDate(iso)) return iso;
       d.setDate(d.getDate() + 1);
     }
     return from;
+  }
+
+  function setClosedNote(el, iso) {
+    if (!el) return;
+    const closed = Boolean(iso) && !hoursForDate(iso);
+    el.hidden = !closed;
+  }
+
+  function updateDayHint(iso) {
+    if (!resDayHint) return;
+    if (!hoursReady && !Array.isArray(venueHours)) {
+      resDayHint.textContent = 'Loading opening hours…';
+      resDayHint.classList.remove('is-closed');
+      return;
+    }
+    if (!iso) {
+      resDayHint.textContent = '';
+      resDayHint.classList.remove('is-closed');
+      return;
+    }
+    const row = dayRow(iso);
+    const open = hoursForDate(iso);
+    if (!open) {
+      resDayHint.textContent = 'Closed on this day — no booking times available.';
+      resDayHint.classList.add('is-closed');
+      return;
+    }
+    resDayHint.textContent = 'Open ' + formatTimePretty(row.open) + ' – last seating ' + formatTimePretty(row.lastSlot);
+    resDayHint.classList.remove('is-closed');
+  }
+
+  function applyVenueHours(data) {
+    if (!data || !Array.isArray(data.hours)) return false;
+    venueHours = data.hours;
+    slotMinutes = data.slotMinutes || 15;
+    closedDates = Array.isArray(data.closedDates) ? data.closedDates : [];
+    hoursReady = true;
+    return true;
   }
 
   function renderReservationSlots() {
@@ -1738,11 +1794,13 @@
     resTimeSelect.disabled = closed;
     resRequest.disabled = closed;
     resLargeNote.hidden = resParty.value !== '13+';
+    updateDayHint(iso);
 
     resTimeSelect.innerHTML = '';
     resSlots.innerHTML = '';
     if (closed) {
       selectedTime = '';
+      resTimeSelect._resSync?.();
       return;
     }
     if (!slots.includes(selectedTime)) selectedTime = slots[0];
@@ -1812,12 +1870,11 @@
     const today = new Date();
     const todayIso = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
     resDate.min = todayIso;
-    resDate.value = nextOpenDate(todayIso);
-    renderReservationSlots();
+    resDate.value = todayIso;
+    resRequest.disabled = true;
+    updateDayHint(resDate.value);
     resDate.addEventListener('change', () => {
-      if (!hoursForDate(resDate.value)) {
-        resDate.value = nextOpenDate(resDate.value);
-      }
+      // Keep the chosen date even when closed so admin closed days are visible.
       renderReservationSlots();
     });
     resParty.addEventListener('change', renderReservationSlots);
@@ -1826,7 +1883,7 @@
       resSlots.querySelectorAll('.res-slot').forEach(el => el.classList.toggle('active', el.textContent === selectedTime));
     });
     resRequest.addEventListener('click', () => {
-      if (!resDate.value || !selectedTime) return;
+      if (!resDate.value || !selectedTime || !hoursForDate(resDate.value)) return;
       const partyLabel = resParty.options[resParty.selectedIndex].text;
       document.getElementById('resSummaryWhen').textContent = formatDatePretty(resDate.value) + ', ' + formatTimePretty(selectedTime);
       document.getElementById('resSummaryParty').textContent = partyLabel;
@@ -1840,6 +1897,10 @@
     });
     resDetailsForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      if (!hoursForDate(resDate.value)) {
+        renderReservationSlots();
+        return;
+      }
       const partyLabel = resParty.options[resParty.selectedIndex].text;
       submitBooking({
         kind: 'table',
@@ -1853,24 +1914,58 @@
         notes: document.getElementById('resSpecial').value.trim()
       }, document.getElementById('resStatus'), document.getElementById('resSubmit'));
     });
+
+    function syncCalendarFromHours() {
+      if (!resDate.value || !hoursForDate(resDate.value)) {
+        resDate.value = nextOpenDate(todayIso);
+      }
+      renderReservationSlots();
+      syncHighTeaDate();
+    }
+
     fetch('/api/hours')
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (!data || !data.hours) return;
-        venueHours = data.hours;
-        slotMinutes = data.slotMinutes || 15;
-        closedDates = data.closedDates || [];
-        if (resDate.value && !hoursForDate(resDate.value)) {
-          resDate.value = nextOpenDate(resDate.value);
+        if (applyVenueHours(data)) {
+          syncCalendarFromHours();
+          return;
         }
-        renderReservationSlots();
+        hoursReady = true;
+        syncCalendarFromHours();
       })
-      .catch(() => {});
+      .catch(() => {
+        hoursReady = true;
+        syncCalendarFromHours();
+      });
+  }
+
+  const htDate = document.getElementById('htDate');
+  const htClosed = document.getElementById('htClosed');
+  const htSubmit = document.getElementById('htSubmit');
+  const htTime = document.getElementById('htTime');
+
+  function syncHighTeaDate() {
+    if (!htDate) return;
+    const closed = Boolean(htDate.value) && !hoursForDate(htDate.value);
+    setClosedNote(htClosed, htDate.value);
+    if (htTime) htTime.disabled = closed;
+    if (htSubmit) htSubmit.disabled = closed;
+  }
+
+  if (htDate) {
+    const today = new Date();
+    htDate.min = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
+    htDate.addEventListener('change', syncHighTeaDate);
+    syncHighTeaDate();
   }
 
   const highteaForm = document.getElementById('highteaForm');
   highteaForm?.addEventListener('submit', (e) => {
     e.preventDefault();
+    if (htDate?.value && !hoursForDate(htDate.value)) {
+      syncHighTeaDate();
+      return;
+    }
     submitBooking({
       kind: 'hightea',
       name: document.getElementById('htName').value.trim(),

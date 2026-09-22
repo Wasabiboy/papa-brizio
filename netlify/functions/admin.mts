@@ -92,8 +92,8 @@ export default async (req: Request) => {
           'default',
           ${settings.timezone},
           ${settings.slotMinutes},
-          ${JSON.stringify(settings.hours)}::jsonb,
-          ${JSON.stringify(settings.closedDates)}::jsonb,
+          ${settings.hours}::jsonb,
+          ${settings.closedDates}::jsonb,
           now()
         )
         ON CONFLICT (id) DO UPDATE SET

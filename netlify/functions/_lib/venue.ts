@@ -30,12 +30,13 @@ export const DEFAULT_SETTINGS: VenueSettings = {
   ],
 };
 
-const HHMM = /^(?:[01]?\d|2[0-3]):[0-5]\d$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
+const DEFAULT_OPEN = "08:00";
+const DEFAULT_LAST_SLOT = "20:00";
 
 export function parseTimeToMinutes(value: string) {
   const raw = String(value || "").trim();
-  const ampm = raw.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/i);
+  const ampm = raw.match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(am|pm)?$/i);
   if (!ampm) return null;
   let hour = Number(ampm[1]);
   const minute = Number(ampm[2]);
@@ -46,35 +47,59 @@ export function parseTimeToMinutes(value: string) {
   return hour * 60 + minute;
 }
 
+export function normalizeTime(value: unknown): string | null {
+  const minutes = parseTimeToMinutes(String(value ?? ""));
+  if (minutes == null) return null;
+  const hour = Math.floor(minutes / 60);
+  const minute = minutes % 60;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
+
+function asHourRows(value: unknown): unknown[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 function asHours(value: unknown): DayHours[] {
-  const rows = Array.isArray(value) ? value : [];
+  const rows = asHourRows(value);
   return DAY_LABELS.map((label, weekday) => {
     const row = rows.find((item) => Number((item as DayHours).weekday) === weekday) as DayHours | undefined;
-    const closed = row ? Boolean(row.closed) : weekday === 1;
-    const open = !closed && row?.open && HHMM.test(row.open) ? row.open : null;
-    const lastSlot = !closed && row?.lastSlot && HHMM.test(row.lastSlot) ? row.lastSlot : null;
+    const fallback = DEFAULT_SETTINGS.hours[weekday];
+    const closed = row ? Boolean(row.closed) : fallback.closed;
+    if (closed) {
+      return { weekday, label, closed: true, open: null, lastSlot: null };
+    }
     return {
       weekday,
       label,
-      closed: closed || !open || !lastSlot,
-      open: closed ? null : open,
-      lastSlot: closed ? null : lastSlot,
+      closed: false,
+      open: normalizeTime(row?.open) || fallback.open || DEFAULT_OPEN,
+      lastSlot: normalizeTime(row?.lastSlot) || fallback.lastSlot || DEFAULT_LAST_SLOT,
     };
   });
 }
 
+function asDateList(value: unknown): string[] {
+  const rows = Array.isArray(value) ? value : typeof value === "string" && value.trim() ? asHourRows(value) : [];
+  return [...new Set(rows.map((d) => String(d)).filter((d) => DATE.test(d)))].sort();
+}
+
 export function normalizeSettings(input: Partial<VenueSettings> | Record<string, unknown> | null | undefined): VenueSettings {
   const slot = Number(input?.slotMinutes ?? (input as { slot_minutes?: number })?.slot_minutes ?? DEFAULT_SETTINGS.slotMinutes);
-  const dates = Array.isArray(input?.closedDates)
-    ? input.closedDates
-    : Array.isArray((input as { closed_dates?: string[] })?.closed_dates)
-      ? (input as { closed_dates: string[] }).closed_dates
-      : [];
+  const dates = asDateList(input?.closedDates ?? (input as { closed_dates?: string[] })?.closed_dates);
   return {
     timezone: String(input?.timezone || DEFAULT_SETTINGS.timezone),
     slotMinutes: [10, 15, 30, 60].includes(slot) ? slot : 15,
     hours: asHours(input?.hours),
-    closedDates: [...new Set(dates.map((d) => String(d)).filter((d) => DATE.test(d)))].sort(),
+    closedDates: dates,
   };
 }
 
