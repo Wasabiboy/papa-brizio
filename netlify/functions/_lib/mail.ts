@@ -13,6 +13,8 @@ export type BookingMail = {
   time: string;
   notes?: string;
   tableLabel?: string;
+  newsletter?: string;
+  occasion?: string;
 };
 
 function escapeHtml(value: string) {
@@ -55,6 +57,8 @@ export function bookingEmail(data: BookingMail, mode: "request" | "confirmed") {
     ["Time", data.time],
   ];
   if (data.tableLabel) rows.push(["Table", data.tableLabel]);
+  if (data.newsletter) rows.push(["Newsletter", data.newsletter]);
+  if (data.occasion) rows.push(["Occasion", data.occasion]);
   rows.push(["Notes", data.notes || "None"]);
 
   const text = [

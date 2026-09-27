@@ -99,6 +99,7 @@
       </div>
       <div class="tabs">
         <button type="button" class="tab on" data-tab="bookings">Bookings</button>
+        <button type="button" class="tab" data-tab="guests">Newsletter</button>
         <button type="button" class="tab" data-tab="hours">Hours</button>
         <a class="tab" href="/">Site</a>
         <button type="button" class="tab" id="logoutBtn">Log out</button>
@@ -225,6 +226,31 @@
       </div>
     </section>
 
+    <section id="guestsPanel" hidden>
+      <div class="card">
+        <div class="row row-2">
+          <div>
+            <label for="guestFilter">Show</label>
+            <select id="guestFilter">
+              <option value="mailing">Mailing list</option>
+              <option value="occasions">Birthdays and events</option>
+              <option value="all">Every visit</option>
+            </select>
+          </div>
+        </div>
+        <p class="summary" id="guestSummary"></p>
+      </div>
+      <div class="card" style="margin-top:1.25rem;overflow:auto">
+        <table>
+          <thead>
+            <tr><th>Guest</th><th>Contact</th><th>Party</th><th>Visit</th><th>Remember</th><th>Mail</th></tr>
+          </thead>
+          <tbody id="guestRows"></tbody>
+        </table>
+        <p class="empty" id="guestEmpty" hidden>No contacts in this list yet.</p>
+      </div>
+    </section>
+
     <section id="hoursPanel" hidden>
       <form class="card" id="hoursForm">
         <h2 class="brand" style="font-size:1.6rem;margin-bottom:.4rem">Opening hours</h2>
@@ -306,7 +332,7 @@
     loginView.hidden = true;
     appView.hidden = false;
     document.getElementById("filterFrom").value = todayIso();
-    await Promise.all([loadBookings(), loadHours()]);
+    await Promise.all([loadBookings(), loadHours(), loadGuests()]);
   }
 
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -331,6 +357,7 @@
       document.querySelectorAll(".tab[data-tab]").forEach((el) => el.classList.toggle("on", el === btn));
       const tab = btn.getAttribute("data-tab");
       document.getElementById("bookingsPanel").hidden = tab !== "bookings";
+      document.getElementById("guestsPanel").hidden = tab !== "guests";
       document.getElementById("hoursPanel").hidden = tab !== "hours";
     });
   });
@@ -338,6 +365,52 @@
   ["filterFrom", "filterStatus", "filterKind"].forEach((id) => {
     document.getElementById(id).addEventListener("change", loadBookings);
   });
+  document.getElementById("guestFilter").addEventListener("change", loadGuests);
+
+  function occasionLabel(row) {
+    const kind = row.occasion === "birthday" ? "Birthday" : row.occasion === "event" ? "Event" : "";
+    if (!kind) return "—";
+    return row.occasion_note ? kind + " · " + row.occasion_note : kind;
+  }
+
+  async function loadGuests() {
+    const filter = document.getElementById("guestFilter").value || "mailing";
+    const data = await api("/api/admin/contacts?filter=" + encodeURIComponent(filter));
+    const rows = data.contacts || [];
+    const counts = data.counts || {};
+    const guestRows = document.getElementById("guestRows");
+    const guestEmpty = document.getElementById("guestEmpty");
+    guestRows.replaceChildren();
+    guestEmpty.hidden = rows.length > 0;
+    document.getElementById("guestSummary").textContent =
+      (counts.mailing || 0) + " on the mailing list · " +
+      (counts.occasions || 0) + " birthdays and events · " +
+      (counts.visits || 0) + " visits saved";
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = "<td></td><td></td><td></td><td></td><td></td><td></td>";
+      const cells = tr.querySelectorAll("td");
+      const name = document.createElement("span");
+      name.className = "guest-name";
+      name.textContent = guestName(row) + (row.booking_kind === "hightea" ? " · High Tea" : "");
+      cells[0].appendChild(name);
+      const email = document.createElement("span");
+      email.className = "guest-name";
+      email.textContent = row.email || "";
+      const phone = document.createElement("span");
+      phone.className = "guest-phone";
+      phone.textContent = row.phone || "";
+      cells[1].append(email, phone);
+      cells[2].textContent = row.party_size || "—";
+      cells[3].textContent = row.visit_date ? prettyDate(row.visit_date) : "—";
+      cells[4].textContent = occasionLabel(row);
+      const pill = document.createElement("span");
+      pill.className = "pill " + (row.opted_in ? "confirmed" : "cancelled");
+      pill.textContent = row.opted_in ? "Opted in" : "Opted out";
+      cells[5].appendChild(pill);
+      guestRows.appendChild(tr);
+    });
+  }
 
   async function loadBookings() {
     const from = document.getElementById("filterFrom").value || todayIso();

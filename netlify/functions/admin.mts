@@ -219,9 +219,47 @@ export default async (req: Request) => {
     return json(405, { error: "Unsupported method." });
   }
 
+  if (path === "/api/admin/contacts") {
+    if (req.method !== "GET") return json(405, { error: "Unsupported method." });
+    const filter = url.searchParams.get("filter") || "mailing";
+    const rows = filter === "occasions"
+      ? await sql`
+          SELECT id, first_name, last_name, name, email, phone, party_size, booking_kind,
+                 visit_date, occasion, occasion_note, opted_in, created_at
+          FROM newsletter_contacts
+          WHERE occasion IN ('birthday', 'event')
+          ORDER BY visit_date DESC NULLS LAST, created_at DESC
+          LIMIT 500
+        `
+      : filter === "all"
+        ? await sql`
+            SELECT id, first_name, last_name, name, email, phone, party_size, booking_kind,
+                   visit_date, occasion, occasion_note, opted_in, created_at
+            FROM newsletter_contacts
+            ORDER BY created_at DESC
+            LIMIT 500
+          `
+        : await sql`
+            SELECT id, first_name, last_name, name, email, phone, party_size, booking_kind,
+                   visit_date, occasion, occasion_note, opted_in, created_at
+            FROM newsletter_contacts
+            WHERE opted_in = true
+            ORDER BY created_at DESC
+            LIMIT 500
+          `;
+    const counts = await sql`
+      SELECT
+        count(*)::int AS visits,
+        count(DISTINCT lower(email)) FILTER (WHERE opted_in)::int AS mailing,
+        count(*) FILTER (WHERE occasion IN ('birthday', 'event'))::int AS occasions
+      FROM newsletter_contacts
+    `;
+    return json(200, { contacts: rows, counts: counts[0] || { visits: 0, mailing: 0, occasions: 0 } });
+  }
+
   return json(404, { error: "Not found." });
 };
 
 export const config: Config = {
-  path: ["/api/admin/session", "/api/admin/bookings", "/api/admin/hours"],
+  path: ["/api/admin/session", "/api/admin/bookings", "/api/admin/hours", "/api/admin/contacts"],
 };

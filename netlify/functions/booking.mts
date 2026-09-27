@@ -21,6 +21,9 @@ type BookingPayload = {
   date?: string;
   time?: string;
   notes?: string;
+  newsletter?: boolean;
+  occasion?: string;
+  occasionNote?: string;
 };
 
 function clip(value: unknown, max: number) {
@@ -75,6 +78,10 @@ export default async (req: Request) => {
   const date = clip(body.date, 10);
   const time = clip(body.time, 20);
   const notes = clip(body.notes, 1000);
+  const occasionRaw = clip(body.occasion, 20);
+  const occasion = occasionRaw === "birthday" || occasionRaw === "event" ? occasionRaw : "";
+  const occasionNote = clip(body.occasionNote, 200);
+  const optedIn = body.newsletter !== false;
   const guest = guestName({ firstName, lastName, name });
 
   if (!guest || !phone || !email || !partySize || !date || !time) {
@@ -123,6 +130,40 @@ export default async (req: Request) => {
     return json(500, { error: "We couldn't save that request. Please call 09 478 9610." });
   }
 
+  try {
+    await sql`
+      UPDATE newsletter_contacts
+      SET opted_in = ${optedIn}, updated_at = now()
+      WHERE lower(email) = ${email}
+    `;
+    await sql`
+      INSERT INTO newsletter_contacts (
+        booking_id, first_name, last_name, name, email, phone, party_size,
+        booking_kind, visit_date, occasion, occasion_note, opted_in
+      ) VALUES (
+        ${bookingId || null},
+        ${firstName || null},
+        ${lastName || null},
+        ${guest},
+        ${email},
+        ${phone},
+        ${partySize},
+        ${kind},
+        ${date},
+        ${occasion},
+        ${occasionNote || null},
+        ${optedIn}
+      )
+    `;
+  } catch (error) {
+    console.error("newsletter save failed", error);
+  }
+
+  const occasionLabel = occasion === "birthday"
+    ? "Birthday"
+    : occasion === "event"
+      ? "Event"
+      : "None";
   const mail = {
     kind,
     guest,
@@ -132,6 +173,8 @@ export default async (req: Request) => {
     date,
     time,
     notes,
+    newsletter: optedIn ? "Opted in" : "Opted out",
+    occasion: occasionNote ? `${occasionLabel} — ${occasionNote}` : occasionLabel,
   };
   try {
     await sendStaffAlert(mail);

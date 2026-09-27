@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7GF7GH9T1D"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7GF7GH9T1D');
+</script>
 <title>Papà Brizio — Ristorante & Espresso Lounge | Mairangi Bay</title>
 <meta name="description" content="Papà Brizio — where flavor, comfort, and style meet in the heart of Mairangi Bay. Italian cuisine, artisan coffee, curated wines & signature cocktails.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -470,18 +479,18 @@
     color: var(--cream); margin-bottom: 0.6rem;
   }
   .res-field select, .res-field input[type=date],
-  .res-details input, .res-details textarea,
+  .res-details input, .res-details textarea, .res-details select,
   .hightea-form select, .hightea-form input, .hightea-form textarea {
     color-scheme: dark;
   }
   .res-field select, .res-field input[type=date],
-  .res-details input, .res-details textarea {
+  .res-details input, .res-details textarea, .res-details select {
     width: 100%; background: #14110f;
     border: 1px solid var(--border); color: var(--cream);
     padding: 0.85rem 1rem; font-family: var(--serif); font-size: 1.1rem;
     border-radius: 0; appearance: none;
   }
-  .res-field select,
+  .res-field select, .res-details select,
   .res-dropdown-trigger {
     background: #14110f url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23c9a96e' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") no-repeat right 1rem center;
     padding-right: 2.5rem;
@@ -491,7 +500,7 @@
     color: #f5f0e8;
   }
   .res-field select:focus, .res-field input:focus,
-  .res-details input:focus, .res-details textarea:focus,
+  .res-details input:focus, .res-details textarea:focus, .res-details select:focus,
   .res-dropdown-trigger:focus {
     outline: none; border-color: var(--gold);
   }
@@ -582,6 +591,13 @@
     color: var(--cream); margin-bottom: 0.4rem;
   }
   .res-details textarea { min-height: 110px; resize: vertical; }
+  .mail-opt {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    margin: 0.25rem 0 1rem; color: var(--cream); line-height: 1.45;
+  }
+  .hightea-form label.mail-opt, .res-details label.mail-opt { display: flex; margin-bottom: 0; }
+  .mail-opt input { width: 1.05rem; height: 1.05rem; margin-top: 0.2rem; accent-color: var(--gold); flex: none; }
+  .mail-opt small { display: block; color: var(--cream-dim); font-size: 0.82rem; margin-top: 0.25rem; }
   .res-details .btn-primary { width: 100%; margin-top: 0.5rem; }
   .res-summary {
     border: 1px solid var(--border); padding: 1.5rem 1.6rem;
@@ -1165,6 +1181,24 @@
             <label for="htDetails">High Tea Details</label>
             <textarea id="htDetails" placeholder="Any special requests, dietary requirements, allergies, or occasion details..."></textarea>
           </div>
+          <div class="hightea-form-row">
+            <div>
+              <label for="htOccasion">Occasion to remember next year</label>
+              <select id="htOccasion">
+                <option value="">No special occasion</option>
+                <option value="birthday">Birthday</option>
+                <option value="event">Celebration or event</option>
+              </select>
+            </div>
+            <div>
+              <label for="htOccasionNote">Who or what to remember</label>
+              <input id="htOccasionNote" type="text" placeholder="e.g. Maria’s birthday">
+            </div>
+          </div>
+          <label class="mail-opt" for="htNewsletter">
+            <input type="checkbox" id="htNewsletter" checked>
+            <span>Email me special events and offers<small>This is ticked by default. Untick to opt out. We use your name, email, and phone for these messages.</small></span>
+          </label>
           <button type="submit" class="btn-primary" id="htSubmit">Book High Tea</button>
           <p class="form-status" id="highteaStatus" role="status"></p>
           <p class="hightea-form-note">You'll get an email as soon as you request. We'll confirm shortly. A $70 deposit is required to secure your spot — refunded if cancelled 24hrs prior.</p>
@@ -1249,8 +1283,26 @@
             </div>
             <div style="margin-bottom:1rem;">
               <label for="resSpecial">Special request</label>
-              <textarea id="resSpecial" placeholder="Allergies, occasion, high chair, outdoor seating…"></textarea>
+              <textarea id="resSpecial" placeholder="Allergies, high chair, outdoor seating…"></textarea>
             </div>
+            <div class="res-details-row">
+              <div>
+                <label for="resOccasion">Occasion to remember next year</label>
+                <select id="resOccasion">
+                  <option value="">No special occasion</option>
+                  <option value="birthday">Birthday</option>
+                  <option value="event">Celebration or event</option>
+                </select>
+              </div>
+              <div>
+                <label for="resOccasionNote">Who or what to remember</label>
+                <input type="text" id="resOccasionNote" placeholder="e.g. Maria’s birthday">
+              </div>
+            </div>
+            <label class="mail-opt" for="resNewsletter">
+              <input type="checkbox" id="resNewsletter" checked>
+              <span>Email me special events and offers<small>This is ticked by default. Untick to opt out. We use your name, email, and phone for these messages.</small></span>
+            </label>
             <button type="submit" class="btn-primary" id="resSubmit">Complete Request</button>
             <p class="form-status" id="resStatus" role="status"></p>
           </form>
@@ -1911,7 +1963,10 @@
         partySize: partyLabel,
         date: resDate.value,
         time: selectedTime,
-        notes: document.getElementById('resSpecial').value.trim()
+        notes: document.getElementById('resSpecial').value.trim(),
+        newsletter: document.getElementById('resNewsletter').checked,
+        occasion: document.getElementById('resOccasion').value,
+        occasionNote: document.getElementById('resOccasionNote').value.trim()
       }, document.getElementById('resStatus'), document.getElementById('resSubmit'));
     });
 
@@ -1974,7 +2029,10 @@
       partySize: document.getElementById('htGuests').value.trim(),
       date: document.getElementById('htDate').value,
       time: document.getElementById('htTime').value,
-      notes: document.getElementById('htDetails').value.trim()
+      notes: document.getElementById('htDetails').value.trim(),
+      newsletter: document.getElementById('htNewsletter').checked,
+      occasion: document.getElementById('htOccasion').value,
+      occasionNote: document.getElementById('htOccasionNote').value.trim()
     }, document.getElementById('highteaStatus'), document.getElementById('htSubmit'));
   });
 </script>
