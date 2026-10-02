@@ -17,6 +17,23 @@ export type BookingMail = {
   occasion?: string;
 };
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DEFAULT_NOTIFY_EMAIL = "montrosecafe@xtra.co.nz";
+
+type MailResult = {
+  ok: boolean;
+  error?: string;
+};
+
+type EmailPayload = {
+  from: string;
+  to: string;
+  replyTo: string;
+  subject: string;
+  text: string;
+  html: string;
+};
+
 function escapeHtml(value: string) {
   return value.replace(/[&<>"']/g, (char) => ({
     "&": "&amp;",
@@ -86,10 +103,43 @@ export function bookingEmail(data: BookingMail, mode: "request" | "confirmed") {
   return { title, heading, text, html };
 }
 
+function staffRecipients() {
+  const configured = env("BOOKING_NOTIFY_EMAILS") || env("BOOKING_NOTIFY_EMAIL") || DEFAULT_NOTIFY_EMAIL;
+  const configuredRecipients = [configured]
+    .flatMap((value) => value.split(/[;,]/))
+    .map((value) => value.trim().toLowerCase())
+    .filter((value) => EMAIL_RE.test(value));
+  const testRecipients = env("BOOKING_TEST_EMAIL")
+    .split(/[;,]/)
+    .map((value) => value.trim().toLowerCase())
+    .filter((value) => EMAIL_RE.test(value));
+  return [...new Set([
+    ...(configuredRecipients.length ? configuredRecipients : [DEFAULT_NOTIFY_EMAIL]),
+    ...testRecipients,
+  ])];
+}
+
+async function deliverWithRetry(
+  resend: Resend,
+  payload: EmailPayload,
+): Promise<MailResult> {
+  let lastError = "Email delivery failed.";
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const result = await resend.emails.send(payload);
+      if (!result.error) return { ok: true };
+      lastError = result.error.message;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+  }
+  return { ok: false, error: lastError };
+}
+
 export async function sendGuestMessage(data: BookingMail, mode: "request" | "confirmed") {
   const key = env("RESEND_API_KEY");
   if (!key) return { ok: false, error: "Email sending is not configured yet." };
-  const notifyEmail = env("BOOKING_NOTIFY_EMAIL") || "montrosecafe@xtra.co.nz";
+  const notifyEmail = staffRecipients()[0];
   const fromEmail = env("RESEND_FROM") || "Papa Brizio <bookings@papabrizio.co.nz>";
   const copy = bookingEmail(data, mode);
   const resend = new Resend(key);
@@ -107,25 +157,17 @@ export async function sendGuestMessage(data: BookingMail, mode: "request" | "con
     text: intro + copy.text,
     html: copy.html,
   };
-  let result = await resend.emails.send(payload);
-  if (result.error) {
-    result = await resend.emails.send(payload);
-  }
-  if (result.error) return { ok: false, error: result.error.message };
-  return { ok: true };
+  return deliverWithRetry(resend, payload);
 }
 
 export async function sendStaffAlert(data: BookingMail) {
   const key = env("RESEND_API_KEY");
-  if (!key) return;
-  const notifyEmail = env("BOOKING_NOTIFY_EMAIL") || "montrosecafe@xtra.co.nz";
-  const testEmail = env("BOOKING_TEST_EMAIL");
+  if (!key) return { ok: false, error: "Email sending is not configured yet." };
   const fromEmail = env("RESEND_FROM") || "Papa Brizio <bookings@papabrizio.co.nz>";
   const copy = bookingEmail(data, "request");
   const resend = new Resend(key);
-  const staffTo = [...new Set([notifyEmail, testEmail].filter(Boolean))];
-  for (const to of staffTo) {
-    const result = await resend.emails.send({
+  const results = await Promise.all(staffRecipients().map(async (to) => {
+    const result = await deliverWithRetry(resend, {
       from: fromEmail,
       to,
       replyTo: data.email,
@@ -133,6 +175,11 @@ export async function sendStaffAlert(data: BookingMail) {
       text: copy.text,
       html: copy.html,
     });
-    if (result.error) console.error("staff email failed", to, result.error);
-  }
+    if (!result.ok) console.error("staff email failed", to, result.error);
+    return result;
+  }));
+  const failed = results.filter((result) => !result.ok);
+  return failed.length
+    ? { ok: false, error: `${failed.length} staff notification email(s) failed.` }
+    : { ok: true };
 }

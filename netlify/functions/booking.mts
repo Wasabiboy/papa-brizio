@@ -176,18 +176,25 @@ export default async (req: Request) => {
     newsletter: optedIn ? "Opted in" : "Opted out",
     occasion: occasionNote ? `${occasionLabel} — ${occasionNote}` : occasionLabel,
   };
-  try {
-    await sendStaffAlert(mail);
-    const guestMail = await sendGuestMessage(mail, "request");
-    if (!guestMail.ok) console.error("guest request email failed", guestMail.error);
-  } catch (error) {
-    console.error("booking email failed", error);
-  }
+  const [staffMail, guestMail] = await Promise.all([
+    sendStaffAlert(mail).catch((error) => ({
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+    })),
+    sendGuestMessage(mail, "request").catch((error) => ({
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+    })),
+  ]);
+  if (!staffMail.ok) console.error("staff booking email failed", staffMail.error);
+  if (!guestMail.ok) console.error("guest request email failed", guestMail.error);
 
   return json(201, {
     ok: true,
     id: bookingId,
-    message: "We've emailed you. We'll confirm your booking shortly.",
+    message: guestMail.ok
+      ? "We've emailed you. We'll confirm your booking shortly."
+      : "Your request is saved. We'll confirm your booking shortly.",
   });
 };
 

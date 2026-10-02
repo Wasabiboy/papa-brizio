@@ -58,6 +58,14 @@
   tr.book { cursor: pointer; }
   tr.book:hover { background: rgba(201,169,110,.08); }
   tr.book.on { background: rgba(201,169,110,.16); }
+  tr.book.is-new { animation: new-booking 3s ease-out; }
+  .refresh-status { min-height: 1.2em; margin-top: .45rem; font-size: .8rem; color: var(--muted); }
+  .refresh-status.new { color: var(--gold); }
+  .refresh-status.err { color: var(--err); }
+  @keyframes new-booking {
+    from { background: rgba(201,169,110,.38); }
+    to { background: transparent; }
+  }
   .pill { display: inline-block; padding: .15rem .5rem; font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; }
   .pill.pending { color: var(--gold); border: 1px solid var(--gold); }
   .pill.confirmed { color: #cde3c4; border: 1px solid #4a5c3a; }
@@ -134,6 +142,7 @@
           </div>
         </div>
         <p class="summary" id="bookingSummary"></p>
+        <p class="refresh-status" id="bookingRefreshStatus" role="status" aria-live="polite"></p>
       </div>
       <div class="layout" style="margin-top:1.25rem">
         <div class="card" style="overflow:auto">
@@ -291,6 +300,10 @@
   let bookings = [];
   let selectedId = "";
   let closedDates = [];
+  let knownBookingIds = new Set();
+  let bookingLoadSequence = 0;
+  let bookingRefreshTimer = null;
+  let bookingRefreshInFlight = false;
 
   function todayIso() {
     const nz = new Date().toLocaleString("en-CA", { timeZone: "Pacific/Auckland" }).slice(0, 10);
@@ -333,6 +346,7 @@
     appView.hidden = false;
     document.getElementById("filterFrom").value = todayIso();
     await Promise.all([loadBookings(), loadHours(), loadGuests()]);
+    startBookingRefresh();
   }
 
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -359,6 +373,7 @@
       document.getElementById("bookingsPanel").hidden = tab !== "bookings";
       document.getElementById("guestsPanel").hidden = tab !== "guests";
       document.getElementById("hoursPanel").hidden = tab !== "hours";
+      if (tab === "bookings") refreshBookings();
     });
   });
 
@@ -412,12 +427,31 @@
     });
   }
 
-  async function loadBookings() {
+  function refreshMessage(text, kind) {
+    const el = document.getElementById("bookingRefreshStatus");
+    el.className = "refresh-status" + (kind ? " " + kind : "");
+    el.textContent = text;
+  }
+
+  function updatedAtMessage() {
+    return "Last updated " + new Date().toLocaleTimeString("en-NZ", {
+      hour: "numeric", minute: "2-digit", second: "2-digit"
+    }) + " · Auto-refreshes every 30 seconds";
+  }
+
+  async function loadBookings({ announceNew = false } = {}) {
+    const sequence = ++bookingLoadSequence;
     const from = document.getElementById("filterFrom").value || todayIso();
     const status = document.getElementById("filterStatus").value;
     const kind = document.getElementById("filterKind").value;
     const data = await api("/api/admin/bookings?from=" + encodeURIComponent(from) + "&status=" + encodeURIComponent(status) + "&kind=" + encodeURIComponent(kind));
+    if (sequence !== bookingLoadSequence) return;
     bookings = data.bookings || [];
+    const nextIds = new Set(bookings.map((row) => row.id));
+    const newIds = announceNew
+      ? new Set(bookings.filter((row) => !knownBookingIds.has(row.id)).map((row) => row.id))
+      : new Set();
+    knownBookingIds = nextIds;
     bookingRows.replaceChildren();
     bookingEmpty.hidden = bookings.length > 0;
     const covers = bookings.reduce((sum, row) => sum + coversOf(row), 0);
@@ -428,7 +462,9 @@
       (pending ? " · " + pending + " pending" : "");
     bookings.forEach((row) => {
       const tr = document.createElement("tr");
-      tr.className = "book" + (row.id === selectedId ? " on" : "");
+      tr.className = "book" +
+        (row.id === selectedId ? " on" : "") +
+        (newIds.has(row.id) ? " is-new" : "");
       tr.innerHTML = "<td></td><td></td><td></td><td></td><td></td>";
       const cells = tr.querySelectorAll("td");
       cells[0].textContent = prettyDate(row.visit_date) + " · " + (row.visit_time || "");
@@ -451,7 +487,37 @@
       tr.addEventListener("click", () => fillEditor(row));
       bookingRows.appendChild(tr);
     });
+    const updated = updatedAtMessage();
+    refreshMessage(newIds.size
+      ? newIds.size + (newIds.size === 1 ? " new booking received · " : " new bookings received · ") + updated
+      : updated, newIds.size ? "new" : "");
   }
+
+  async function refreshBookings() {
+    if (
+      bookingRefreshInFlight ||
+      appView.hidden ||
+      document.getElementById("bookingsPanel").hidden ||
+      document.visibilityState === "hidden"
+    ) return;
+    bookingRefreshInFlight = true;
+    try {
+      await loadBookings({ announceNew: true });
+    } catch (err) {
+      refreshMessage("Auto-refresh failed: " + err.message + " · Will retry shortly", "err");
+    } finally {
+      bookingRefreshInFlight = false;
+    }
+  }
+
+  function startBookingRefresh() {
+    if (bookingRefreshTimer) clearInterval(bookingRefreshTimer);
+    bookingRefreshTimer = setInterval(refreshBookings, 30000);
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") refreshBookings();
+  });
 
   function fillEditor(row) {
     selectedId = row.id;
