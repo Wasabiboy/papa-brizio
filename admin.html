@@ -82,8 +82,27 @@
   .chip { border: 1px solid var(--border); padding: .35rem .6rem; display: flex; gap: .5rem; align-items: center; }
   .chip button { background: none; border: 0; color: var(--err); cursor: pointer; }
   .empty { color: var(--muted); padding: 1.5rem 0; }
+  .cal-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .35rem; }
+  .cal-head .btn { flex: none; }
+  .cal-title { flex: 1; text-align: center; font-family: var(--serif); font-size: 1.7rem; font-weight: 400; }
+  .cal-note { color: var(--muted); margin-bottom: 1rem; font-size: .9rem; }
+  .cal-weekdays, .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .35rem; }
+  .cal-weekdays span { text-align: center; color: var(--gold); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; padding-bottom: .35rem; }
+  .cal-day {
+    min-width: 0; min-height: 4.5rem; background: #0f0d0c; border: 1px solid var(--border); color: var(--cream);
+    padding: .4rem .45rem; text-align: left; cursor: pointer;
+  }
+  .cal-day .num { font-family: var(--serif); font-size: 1.05rem; display: block; }
+  .cal-day .count { display: block; margin-top: .3rem; font-size: .72rem; line-height: 1.3; color: var(--gold); overflow-wrap: anywhere; }
+  .cal-day.has { border-color: rgba(201,169,110,.7); background: rgba(201,169,110,.12); }
+  .cal-day.pending { box-shadow: inset 3px 0 0 var(--gold); }
+  .cal-day.today .num { text-decoration: underline; text-underline-offset: .15rem; }
+  .cal-day.on { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+  .cal-day.on .count { color: var(--bg); }
   @media (max-width: 900px) {
     .layout, .row-2, .row-3, .hours-row { grid-template-columns: 1fr; }
+    .cal-day { min-height: 3.4rem; padding: .28rem; }
+    .cal-day .count { font-size: .62rem; }
   }
 </style>
 </head>
@@ -116,9 +135,21 @@
 
     <section id="bookingsPanel">
       <div class="card">
+        <div class="cal-head">
+          <button class="btn btn-ghost" type="button" id="calPrev">Previous</button>
+          <h2 class="cal-title" id="calTitle">Bookings</h2>
+          <button class="btn btn-ghost" type="button" id="calNext">Next</button>
+        </div>
+        <p class="cal-note" id="calNote">Days with bookings are highlighted. Select a day to see those guests.</p>
+        <div class="cal-weekdays" aria-hidden="true">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+      <div class="card">
         <div class="row row-3">
           <div>
-            <label for="filterFrom">From</label>
+            <label for="filterFrom">Jump to date</label>
             <input id="filterFrom" type="date">
           </div>
           <div>
@@ -152,7 +183,7 @@
             </thead>
             <tbody id="bookingRows"></tbody>
           </table>
-          <p class="empty" id="bookingEmpty" hidden>No bookings in this range.</p>
+          <p class="empty" id="bookingEmpty" hidden>No bookings in this month.</p>
         </div>
         <form class="card" id="editForm" hidden>
           <h2 class="brand" style="font-size:1.6rem;margin-bottom:1rem">Edit booking</h2>
@@ -298,9 +329,14 @@
   const bookingEmpty = document.getElementById("bookingEmpty");
   const editForm = document.getElementById("editForm");
   let bookings = [];
+  let monthBookings = [];
   let selectedId = "";
+  let selectedDay = "";
+  let calYear = 0;
+  let calMonth = 0;
   let closedDates = [];
   let knownBookingIds = new Set();
+  let newBookingIds = new Set();
   let bookingLoadSequence = 0;
   let bookingRefreshTimer = null;
   let bookingRefreshInFlight = false;
@@ -344,7 +380,11 @@
   async function showApp() {
     loginView.hidden = true;
     appView.hidden = false;
-    document.getElementById("filterFrom").value = todayIso();
+    const today = todayIso();
+    document.getElementById("filterFrom").value = today;
+    calYear = Number(today.slice(0, 4));
+    calMonth = Number(today.slice(5, 7)) - 1;
+    selectedDay = "";
     await Promise.all([loadBookings(), loadHours(), loadGuests()]);
     startBookingRefresh();
   }
@@ -377,9 +417,92 @@
     });
   });
 
-  ["filterFrom", "filterStatus", "filterKind"].forEach((id) => {
+  document.getElementById("filterFrom").addEventListener("change", () => {
+    const value = document.getElementById("filterFrom").value;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      calYear = Number(value.slice(0, 4));
+      calMonth = Number(value.slice(5, 7)) - 1;
+      selectedDay = value;
+    }
+    loadBookings();
+  });
+  ["filterStatus", "filterKind"].forEach((id) => {
     document.getElementById(id).addEventListener("change", loadBookings);
   });
+  document.getElementById("calPrev").addEventListener("click", () => shiftMonth(-1));
+  document.getElementById("calNext").addEventListener("click", () => shiftMonth(1));
+
+  function pad2(n) {
+    return String(n).padStart(2, "0");
+  }
+  function monthBounds() {
+    const start = calYear + "-" + pad2(calMonth + 1) + "-01";
+    const last = new Date(calYear, calMonth + 1, 0).getDate();
+    return { start, end: calYear + "-" + pad2(calMonth + 1) + "-" + pad2(last) };
+  }
+  function shiftMonth(delta) {
+    const next = new Date(calYear, calMonth + delta, 1);
+    calYear = next.getFullYear();
+    calMonth = next.getMonth();
+    selectedDay = "";
+    document.getElementById("filterFrom").value = monthBounds().start;
+    loadBookings();
+  }
+  function visibleBookings() {
+    if (!selectedDay) return monthBookings;
+    return monthBookings.filter((row) => isoDate(row.visit_date) === selectedDay);
+  }
+  function renderCalendar() {
+    const title = new Date(calYear, calMonth, 1).toLocaleDateString("en-NZ", { month: "long", year: "numeric" });
+    document.getElementById("calTitle").textContent = title;
+    document.getElementById("calNote").textContent = selectedDay
+      ? "Showing " + prettyDate(selectedDay) + ". Select the day again to see the whole month."
+      : "Days with bookings are highlighted. Select a day to see those guests.";
+    const grid = document.getElementById("calGrid");
+    grid.replaceChildren();
+    const byDate = new Map();
+    monthBookings.forEach((row) => {
+      const key = isoDate(row.visit_date);
+      if (!byDate.has(key)) byDate.set(key, []);
+      byDate.get(key).push(row);
+    });
+    const firstDow = (new Date(calYear, calMonth, 1).getDay() + 6) % 7;
+    for (let i = 0; i < firstDow; i++) grid.appendChild(document.createElement("div"));
+    const today = todayIso();
+    const days = new Date(calYear, calMonth + 1, 0).getDate();
+    for (let day = 1; day <= days; day++) {
+      const iso = calYear + "-" + pad2(calMonth + 1) + "-" + pad2(day);
+      const rows = byDate.get(iso) || [];
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "cal-day"
+        + (rows.length ? " has" : "")
+        + (rows.some((row) => row.status === "pending") ? " pending" : "")
+        + (iso === today ? " today" : "")
+        + (iso === selectedDay ? " on" : "");
+      btn.setAttribute("aria-pressed", iso === selectedDay ? "true" : "false");
+      btn.setAttribute("aria-label", prettyDate(iso) + (rows.length ? ", " + rows.length + (rows.length === 1 ? " booking" : " bookings") : ", no bookings"));
+      const num = document.createElement("span");
+      num.className = "num";
+      num.textContent = String(day);
+      btn.appendChild(num);
+      if (rows.length) {
+        const count = document.createElement("span");
+        count.className = "count";
+        const covers = rows.reduce((sum, row) => sum + coversOf(row), 0);
+        count.textContent = rows.length + (covers ? " · " + covers + (covers === 1 ? " guest" : " guests") : "");
+        btn.appendChild(count);
+        btn.title = rows.map((row) => [row.visit_time, guestName(row), row.party_size].filter(Boolean).join(" · ")).join("\n");
+      }
+      btn.addEventListener("click", () => {
+        selectedDay = selectedDay === iso ? "" : iso;
+        document.getElementById("filterFrom").value = selectedDay || monthBounds().start;
+        renderCalendar();
+        renderBookingList();
+      });
+      grid.appendChild(btn);
+    }
+  }
   document.getElementById("guestFilter").addEventListener("change", loadGuests);
 
   function occasionLabel(row) {
@@ -439,24 +562,18 @@
     }) + " · Auto-refreshes every 30 seconds";
   }
 
-  async function loadBookings({ announceNew = false } = {}) {
-    const sequence = ++bookingLoadSequence;
-    const from = document.getElementById("filterFrom").value || todayIso();
-    const status = document.getElementById("filterStatus").value;
-    const kind = document.getElementById("filterKind").value;
-    const data = await api("/api/admin/bookings?from=" + encodeURIComponent(from) + "&status=" + encodeURIComponent(status) + "&kind=" + encodeURIComponent(kind));
-    if (sequence !== bookingLoadSequence) return;
-    bookings = data.bookings || [];
-    const nextIds = new Set(bookings.map((row) => row.id));
-    const newIds = announceNew
-      ? new Set(bookings.filter((row) => !knownBookingIds.has(row.id)).map((row) => row.id))
-      : new Set();
-    knownBookingIds = nextIds;
+  function renderBookingList() {
+    bookings = visibleBookings();
     bookingRows.replaceChildren();
     bookingEmpty.hidden = bookings.length > 0;
+    bookingEmpty.textContent = selectedDay ? "No bookings on this day." : "No bookings in this month.";
     const covers = bookings.reduce((sum, row) => sum + coversOf(row), 0);
     const pending = bookings.filter((row) => row.status === "pending").length;
+    const when = selectedDay
+      ? prettyDate(selectedDay)
+      : new Date(calYear, calMonth, 1).toLocaleDateString("en-NZ", { month: "long", year: "numeric" });
     document.getElementById("bookingSummary").textContent =
+      when + " · " +
       bookings.length + (bookings.length === 1 ? " booking" : " bookings") +
       " · " + covers + (covers === 1 ? " guest" : " guests") +
       (pending ? " · " + pending + " pending" : "");
@@ -464,7 +581,7 @@
       const tr = document.createElement("tr");
       tr.className = "book" +
         (row.id === selectedId ? " on" : "") +
-        (newIds.has(row.id) ? " is-new" : "");
+        (newBookingIds.has(row.id) ? " is-new" : "");
       tr.innerHTML = "<td></td><td></td><td></td><td></td><td></td>";
       const cells = tr.querySelectorAll("td");
       cells[0].textContent = prettyDate(row.visit_date) + " · " + (row.visit_time || "");
@@ -487,10 +604,30 @@
       tr.addEventListener("click", () => fillEditor(row));
       bookingRows.appendChild(tr);
     });
+  }
+
+  async function loadBookings({ announceNew = false } = {}) {
+    const sequence = ++bookingLoadSequence;
+    const status = document.getElementById("filterStatus").value;
+    const kind = document.getElementById("filterKind").value;
+    const range = monthBounds();
+    const data = await api("/api/admin/bookings?from=" + encodeURIComponent(range.start) + "&to=" + encodeURIComponent(range.end) + "&status=" + encodeURIComponent(status) + "&kind=" + encodeURIComponent(kind));
+    if (sequence !== bookingLoadSequence) return;
+    monthBookings = (data.bookings || []).filter((row) => {
+      const day = isoDate(row.visit_date);
+      return day >= range.start && day <= range.end;
+    });
+    const nextIds = new Set(monthBookings.map((row) => row.id));
+    newBookingIds = announceNew
+      ? new Set(monthBookings.filter((row) => !knownBookingIds.has(row.id)).map((row) => row.id))
+      : new Set();
+    knownBookingIds = nextIds;
+    renderCalendar();
+    renderBookingList();
     const updated = updatedAtMessage();
-    refreshMessage(newIds.size
-      ? newIds.size + (newIds.size === 1 ? " new booking received · " : " new bookings received · ") + updated
-      : updated, newIds.size ? "new" : "");
+    refreshMessage(newBookingIds.size
+      ? newBookingIds.size + (newBookingIds.size === 1 ? " new booking received · " : " new bookings received · ") + updated
+      : updated, newBookingIds.size ? "new" : "");
   }
 
   async function refreshBookings() {
