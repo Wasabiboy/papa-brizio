@@ -19,6 +19,7 @@ export type BookingMail = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEFAULT_NOTIFY_EMAIL = "montrosecafe@xtra.co.nz";
+const REQUIRED_NOTIFY_EMAILS = ["montrosecafebistro@gmail.com"];
 
 type MailResult = {
   ok: boolean;
@@ -115,6 +116,7 @@ function staffRecipients() {
     .filter((value) => EMAIL_RE.test(value));
   return [...new Set([
     ...(configuredRecipients.length ? configuredRecipients : [DEFAULT_NOTIFY_EMAIL]),
+    ...REQUIRED_NOTIFY_EMAILS,
     ...testRecipients,
   ])];
 }
