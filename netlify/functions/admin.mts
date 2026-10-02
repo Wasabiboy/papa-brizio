@@ -203,8 +203,12 @@ export default async (req: Request) => {
           time,
           notes,
           tableLabel,
-        }, "confirmed");
+        }, "confirmed").catch((error) => ({
+          ok: false,
+          error: error instanceof Error ? error.message : String(error),
+        }));
         if (!mail.ok) {
+          console.error("guest confirmation email failed", mail.error);
           return json(200, {
             ok: true,
             booking: rows[0],
