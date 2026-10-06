@@ -1,6 +1,6 @@
 import type { Config } from "@netlify/functions";
 import { sendGuestMessage, sendStaffAlert } from "./_lib/mail";
-import { sqlClient } from "./_lib/db";
+import { ensureVenueSettingsSchema, sqlClient } from "./_lib/db";
 import { env } from "./_lib/env";
 import { isValidSlot, settingsFromRow } from "./_lib/venue";
 
@@ -53,6 +53,7 @@ export default async (req: Request) => {
   if (!sql) {
     return json(500, { error: "Bookings are not configured yet." });
   }
+  await ensureVenueSettingsSchema(sql);
   if (!resendKey) {
     return json(500, { error: "Email sending is not configured yet." });
   }
