@@ -1,6 +1,6 @@
 import type { Config } from "@netlify/functions";
 import { cookieHeader, isAuthed, makeToken, passwordOk } from "./_lib/auth";
-import { sqlClient } from "./_lib/db";
+import { ensureVenueSettingsSchema, sqlClient } from "./_lib/db";
 import { sendGuestMessage, type BookingKind } from "./_lib/mail";
 import { DEFAULT_SETTINGS, isOpenOnDate, normalizeSettings, settingsFromRow } from "./_lib/venue";
 
@@ -64,6 +64,7 @@ export default async (req: Request) => {
   if (!sql) {
     return json(500, { error: "Database is not configured." });
   }
+  await ensureVenueSettingsSchema(sql);
 
   if (path === "/api/admin/hours") {
     if (req.method === "GET") {
