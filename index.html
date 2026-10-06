@@ -1754,6 +1754,7 @@
   let venueHours = null;
   let slotMinutes = 15;
   let closedDates = [];
+  let blockedTimes = [];
   let hoursReady = false;
   const resDayHint = document.getElementById('resDayHint');
 
@@ -1777,13 +1778,42 @@
     return { start, end };
   }
 
+  // A block covers its start time up to, but not including, its end time.
+  function blocksForDate(iso) {
+    return blockedTimes
+      .filter(b => b.date === iso && toMinutes(b.from) != null && toMinutes(b.to) != null)
+      .sort((a, b) => toMinutes(a.from) - toMinutes(b.from));
+  }
+
+  function isBlockedAt(iso, minutes) {
+    return blocksForDate(iso).some(b => minutes >= toMinutes(b.from) && minutes < toMinutes(b.to));
+  }
+
   function slotsForDate(iso) {
     const hours = hoursForDate(iso);
     if (!hours) return [];
     const step = slotMinutes || 15;
     const out = [];
-    for (let t = hours.start; t <= hours.end; t += step) out.push(formatTime(t));
+    for (let t = hours.start; t <= hours.end; t += step) {
+      if (!isBlockedAt(iso, t)) out.push(formatTime(t));
+    }
     return out;
+  }
+
+  function blockedSummary(iso) {
+    return blocksForDate(iso)
+      .map(b => formatTimePretty(b.from) + ' – ' + formatTimePretty(b.to))
+      .join(', ');
+  }
+
+  function clock12ToMinutes(label) {
+    const m = String(label || '').trim().match(/^(\d{1,2}):(\d{2})\s*(am|pm)?$/i);
+    if (!m) return null;
+    let h = Number(m[1]);
+    const suffix = (m[3] || '').toLowerCase();
+    if (suffix === 'pm' && h < 12) h += 12;
+    if (suffix === 'am' && h === 12) h = 0;
+    return h * 60 + Number(m[2]);
   }
 
   function nextOpenDate(from) {
@@ -1822,7 +1852,9 @@
       resDayHint.classList.add('is-closed');
       return;
     }
-    resDayHint.textContent = 'Open ' + formatTimePretty(row.open) + ' – last seating ' + formatTimePretty(row.lastSlot);
+    const blocked = blockedSummary(iso);
+    resDayHint.textContent = 'Open ' + formatTimePretty(row.open) + ' – last seating ' + formatTimePretty(row.lastSlot) +
+      (blocked ? ' · Not available ' + blocked : '');
     resDayHint.classList.remove('is-closed');
   }
 
@@ -1831,8 +1863,15 @@
     venueHours = data.hours;
     slotMinutes = data.slotMinutes || 15;
     closedDates = Array.isArray(data.closedDates) ? data.closedDates : [];
+    blockedTimes = Array.isArray(data.blockedTimes) ? data.blockedTimes : [];
     hoursReady = true;
     return true;
+  }
+
+  function unavailableMessage(iso) {
+    return hoursForDate(iso)
+      ? 'No times are available on this day. Please choose another day, or call 09 478 9610.'
+      : 'We’re closed on this day. Please choose another day, or call 09 478 9610.';
   }
 
   function renderReservationSlots() {
@@ -1841,6 +1880,7 @@
     const slots = slotsForDate(iso);
     const closed = slots.length === 0;
     resClosed.hidden = !closed;
+    if (closed) resClosed.textContent = unavailableMessage(iso);
     resSlotsLabel.hidden = closed;
     resSlots.hidden = closed;
     resTimeSelect.disabled = closed;
@@ -1949,8 +1989,10 @@
     });
     resDetailsForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      if (!hoursForDate(resDate.value)) {
+      if (!hoursForDate(resDate.value) || !slotsForDate(resDate.value).includes(selectedTime)) {
         renderReservationSlots();
+        resStep2.classList.remove('active');
+        resStep1.classList.add('active');
         return;
       }
       const partyLabel = resParty.options[resParty.selectedIndex].text;
@@ -1999,11 +2041,45 @@
   const htSubmit = document.getElementById('htSubmit');
   const htTime = document.getElementById('htTime');
 
+  const htTimeOptions = htTime
+    ? [...htTime.options].filter(o => o.value !== '').map(o => o.textContent.trim())
+    : [];
+
+  function highTeaTimesForDate(iso) {
+    if (!iso || !hoursForDate(iso)) return htTimeOptions.slice();
+    return htTimeOptions.filter(label => {
+      const minutes = clock12ToMinutes(label);
+      return minutes == null || !isBlockedAt(iso, minutes);
+    });
+  }
+
   function syncHighTeaDate() {
     if (!htDate) return;
-    const closed = Boolean(htDate.value) && !hoursForDate(htDate.value);
-    setClosedNote(htClosed, htDate.value);
-    if (htTime) htTime.disabled = closed;
+    const iso = htDate.value;
+    const dayOpen = Boolean(iso) && Boolean(hoursForDate(iso));
+    const times = highTeaTimesForDate(iso);
+    const noTimes = dayOpen && times.length === 0;
+    const closed = (Boolean(iso) && !dayOpen) || noTimes;
+    if (htTime) {
+      const previous = htTime.value;
+      htTime.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Select time';
+      htTime.appendChild(placeholder);
+      times.forEach(label => {
+        const opt = document.createElement('option');
+        opt.textContent = label;
+        htTime.appendChild(opt);
+      });
+      htTime.value = times.includes(previous) ? previous : '';
+      htTime.disabled = closed;
+      htTime._resSync?.();
+    }
+    if (htClosed) {
+      htClosed.hidden = !closed;
+      if (closed) htClosed.textContent = unavailableMessage(iso);
+    }
     if (htSubmit) htSubmit.disabled = closed;
   }
 
@@ -2017,7 +2093,7 @@
   const highteaForm = document.getElementById('highteaForm');
   highteaForm?.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (htDate?.value && !hoursForDate(htDate.value)) {
+    if (htDate?.value && (!hoursForDate(htDate.value) || !highTeaTimesForDate(htDate.value).includes(htTime.value))) {
       syncHighTeaDate();
       return;
     }

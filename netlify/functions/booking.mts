@@ -95,7 +95,7 @@ export default async (req: Request) => {
   }
 
   try {
-    const settingRows = await sql`SELECT timezone, slot_minutes, hours, closed_dates FROM venue_settings WHERE id = 'default' LIMIT 1`;
+    const settingRows = await sql`SELECT timezone, slot_minutes, hours, closed_dates, blocked_times FROM venue_settings WHERE id = 'default' LIMIT 1`;
     const settings = settingsFromRow(settingRows[0] as Record<string, unknown> | undefined);
     if (!isValidSlot(settings, date, time)) {
       return json(400, { error: "That date or time isn't available. Please choose another." });

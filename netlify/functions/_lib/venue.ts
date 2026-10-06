@@ -6,11 +6,19 @@ export type DayHours = {
   lastSlot: string | null;
 };
 
+export type BlockedTime = {
+  date: string;
+  from: string;
+  to: string;
+  note: string;
+};
+
 export type VenueSettings = {
   timezone: string;
   slotMinutes: number;
   hours: DayHours[];
   closedDates: string[];
+  blockedTimes: BlockedTime[];
 };
 
 export const DAY_LABELS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -19,6 +27,7 @@ export const DEFAULT_SETTINGS: VenueSettings = {
   timezone: "Pacific/Auckland",
   slotMinutes: 15,
   closedDates: [],
+  blockedTimes: [],
   hours: [
     { weekday: 0, label: "Sunday", closed: false, open: "08:00", lastSlot: "20:00" },
     { weekday: 1, label: "Monday", closed: true, open: null, lastSlot: null },
@@ -92,6 +101,26 @@ function asDateList(value: unknown): string[] {
   return [...new Set(rows.map((d) => String(d)).filter((d) => DATE.test(d)))].sort();
 }
 
+function asBlockedTimes(value: unknown): BlockedTime[] {
+  const seen = new Set<string>();
+  const out: BlockedTime[] = [];
+  for (const item of asHourRows(value).slice(0, 500)) {
+    const row = item as Partial<BlockedTime>;
+    const date = String(row?.date ?? "");
+    const from = normalizeTime(row?.from);
+    const to = normalizeTime(row?.to);
+    if (!DATE.test(date) || !from || !to) continue;
+    const start = parseTimeToMinutes(from);
+    const end = parseTimeToMinutes(to);
+    if (start == null || end == null || start >= end) continue;
+    const key = `${date}|${from}|${to}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ date, from, to, note: String(row?.note ?? "").trim().slice(0, 80) });
+  }
+  return out.sort((a, b) => `${a.date} ${a.from}`.localeCompare(`${b.date} ${b.from}`));
+}
+
 export function normalizeSettings(input: Partial<VenueSettings> | Record<string, unknown> | null | undefined): VenueSettings {
   const slot = Number(input?.slotMinutes ?? (input as { slot_minutes?: number })?.slot_minutes ?? DEFAULT_SETTINGS.slotMinutes);
   const dates = asDateList(input?.closedDates ?? (input as { closed_dates?: string[] })?.closed_dates);
@@ -100,6 +129,7 @@ export function normalizeSettings(input: Partial<VenueSettings> | Record<string,
     slotMinutes: [10, 15, 30, 60].includes(slot) ? slot : 15,
     hours: asHours(input?.hours),
     closedDates: dates,
+    blockedTimes: asBlockedTimes(input?.blockedTimes ?? (input as { blocked_times?: unknown })?.blocked_times),
   };
 }
 
@@ -110,6 +140,17 @@ export function settingsFromRow(row: Record<string, unknown> | undefined) {
     slotMinutes: row.slot_minutes as number,
     hours: row.hours as DayHours[],
     closedDates: row.closed_dates as string[],
+    blockedTimes: row.blocked_times as BlockedTime[],
+  });
+}
+
+/** A block covers its start time up to, but not including, its end time. */
+export function isBlockedAt(settings: VenueSettings, date: string, minutes: number) {
+  return settings.blockedTimes.some((block) => {
+    if (block.date !== date) return false;
+    const start = parseTimeToMinutes(block.from);
+    const end = parseTimeToMinutes(block.to);
+    return start != null && end != null && minutes >= start && minutes < end;
   });
 }
 
@@ -129,5 +170,6 @@ export function isValidSlot(settings: VenueSettings, date: string, time: string)
   const start = parseTimeToMinutes(day.open);
   const end = parseTimeToMinutes(day.lastSlot);
   if (t == null || start == null || end == null || t < start || t > end) return false;
+  if (isBlockedAt(settings, date, t)) return false;
   return (t - start) % settings.slotMinutes === 0;
 }

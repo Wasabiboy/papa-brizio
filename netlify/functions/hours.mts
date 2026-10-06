@@ -18,7 +18,7 @@ export default async (req: Request) => {
     return json(200, DEFAULT_SETTINGS);
   }
   try {
-    const rows = await sql`SELECT timezone, slot_minutes, hours, closed_dates FROM venue_settings WHERE id = 'default' LIMIT 1`;
+    const rows = await sql`SELECT timezone, slot_minutes, hours, closed_dates, blocked_times FROM venue_settings WHERE id = 'default' LIMIT 1`;
     return json(200, settingsFromRow(rows[0] as Record<string, unknown> | undefined));
   } catch (error) {
     console.error("hours load failed", error);

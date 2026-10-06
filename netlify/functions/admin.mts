@@ -67,7 +67,7 @@ export default async (req: Request) => {
 
   if (path === "/api/admin/hours") {
     if (req.method === "GET") {
-      const rows = await sql`SELECT timezone, slot_minutes, hours, closed_dates FROM venue_settings WHERE id = 'default' LIMIT 1`;
+      const rows = await sql`SELECT timezone, slot_minutes, hours, closed_dates, blocked_times FROM venue_settings WHERE id = 'default' LIMIT 1`;
       return json(200, settingsFromRow(rows[0] as Record<string, unknown> | undefined));
     }
     if (req.method === "POST") {
@@ -87,13 +87,14 @@ export default async (req: Request) => {
         }
       }
       await sql`
-        INSERT INTO venue_settings (id, timezone, slot_minutes, hours, closed_dates, updated_at)
+        INSERT INTO venue_settings (id, timezone, slot_minutes, hours, closed_dates, blocked_times, updated_at)
         VALUES (
           'default',
           ${settings.timezone},
           ${settings.slotMinutes},
           ${settings.hours}::jsonb,
           ${settings.closedDates}::jsonb,
+          ${JSON.stringify(settings.blockedTimes)}::text::jsonb,
           now()
         )
         ON CONFLICT (id) DO UPDATE SET
@@ -101,6 +102,7 @@ export default async (req: Request) => {
           slot_minutes = EXCLUDED.slot_minutes,
           hours = EXCLUDED.hours,
           closed_dates = EXCLUDED.closed_dates,
+          blocked_times = EXCLUDED.blocked_times,
           updated_at = now()
       `;
       return json(200, { ok: true, ...settings });
@@ -164,7 +166,7 @@ export default async (req: Request) => {
         return json(400, { error: "Please check the booking details." });
       }
 
-      const settingRows = await sql`SELECT timezone, slot_minutes, hours, closed_dates FROM venue_settings WHERE id = 'default' LIMIT 1`;
+      const settingRows = await sql`SELECT timezone, slot_minutes, hours, closed_dates, blocked_times FROM venue_settings WHERE id = 'default' LIMIT 1`;
       const settings = settingsFromRow(settingRows[0] as Record<string, unknown> | undefined) || DEFAULT_SETTINGS;
       if (status !== "cancelled" && !isOpenOnDate(settings, date)) {
         return json(400, { error: "That date is marked closed in Hours. Open the day, choose another date, or cancel." });

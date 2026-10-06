@@ -81,6 +81,13 @@
   .closed-list { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
   .chip { border: 1px solid var(--border); padding: .35rem .6rem; display: flex; gap: .5rem; align-items: center; }
   .chip button { background: none; border: 0; color: var(--err); cursor: pointer; }
+  .block-row { display: grid; grid-template-columns: 9.5rem 8rem 8rem 1fr auto; gap: .75rem; align-items: end; }
+  .block-add .btn { white-space: nowrap; }
+  .block-list { display: grid; gap: .5rem; margin: .75rem 0 1.25rem; }
+  .block-item { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid var(--border); padding: .55rem .75rem; }
+  .block-item strong { font-family: var(--serif); font-weight: 400; font-size: 1.05rem; }
+  .block-item small { display: block; color: var(--muted); margin-top: .15rem; }
+  .block-item button { background: none; border: 0; color: var(--err); cursor: pointer; font-size: 1.2rem; }
   .empty { color: var(--muted); padding: 1.5rem 0; }
   .cal-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .35rem; }
   .cal-head .btn { flex: none; }
@@ -100,7 +107,7 @@
   .cal-day.on { background: var(--gold); color: var(--bg); border-color: var(--gold); }
   .cal-day.on .count { color: var(--bg); }
   @media (max-width: 900px) {
-    .layout, .row-2, .row-3, .hours-row { grid-template-columns: 1fr; }
+    .layout, .row-2, .row-3, .hours-row, .block-row { grid-template-columns: 1fr; }
     .cal-day { min-height: 3.4rem; padding: .28rem; }
     .cal-day .count { font-size: .62rem; }
   }
@@ -316,6 +323,31 @@
           </div>
         </div>
         <div class="closed-list" id="closedList"></div>
+        <h3 class="brand" style="font-size:1.3rem;margin:1.5rem 0 .4rem">Blocked times</h3>
+        <p class="sub" style="margin-bottom:.9rem">Block any date and time window, for example a Saturday from 5:00 pm to 7:00 pm. Times from the start up to, but not including, the end are removed from the booking form. Bookings already made stay in the Bookings list.</p>
+        <div class="block-row">
+          <div>
+            <label for="blockDate">Date</label>
+            <input id="blockDate" type="date">
+          </div>
+          <div>
+            <label for="blockFrom">Blocked from</label>
+            <input id="blockFrom" type="time">
+          </div>
+          <div>
+            <label for="blockTo">Blocked until</label>
+            <input id="blockTo" type="time">
+          </div>
+          <div>
+            <label for="blockNote">Note (optional)</label>
+            <input id="blockNote" type="text" maxlength="80" placeholder="e.g. Private function">
+          </div>
+          <div class="block-add">
+            <button class="btn btn-ghost" type="button" id="addBlock">Add block</button>
+          </div>
+        </div>
+        <p class="status" id="blockStatus"></p>
+        <div class="block-list" id="blockList"></div>
         <button class="btn" type="submit">Save hours</button>
         <p class="status" id="hoursStatus"></p>
       </form>
@@ -335,6 +367,7 @@
   let calYear = 0;
   let calMonth = 0;
   let closedDates = [];
+  let blockedTimes = [];
   let knownBookingIds = new Set();
   let newBookingIds = new Set();
   let bookingLoadSequence = 0;
@@ -747,8 +780,68 @@
         lastSlot: closed ? null : row.querySelector(".day-last").value || "20:00"
       };
     });
-    return { timezone: "Pacific/Auckland", slotMinutes: Number(document.getElementById("slotMinutes").value), hours, closedDates };
+    return { timezone: "Pacific/Auckland", slotMinutes: Number(document.getElementById("slotMinutes").value), hours, closedDates, blockedTimes };
   }
+
+  function clockLabel(hhmm) {
+    const [h, m] = String(hhmm || "").split(":").map(Number);
+    if (!Number.isFinite(h) || !Number.isFinite(m)) return "";
+    return (((h + 11) % 12) + 1) + ":" + String(m).padStart(2, "0") + " " + (h >= 12 ? "pm" : "am");
+  }
+
+  function renderBlocks() {
+    const list = document.getElementById("blockList");
+    list.replaceChildren();
+    blockedTimes.forEach((block) => {
+      const item = document.createElement("div");
+      item.className = "block-item";
+      const text = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = prettyDate(block.date) + " · " + clockLabel(block.from) + " – " + clockLabel(block.to);
+      text.appendChild(title);
+      if (block.note) {
+        const note = document.createElement("small");
+        note.textContent = block.note;
+        text.appendChild(note);
+      }
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "×";
+      remove.setAttribute("aria-label", "Remove block on " + prettyDate(block.date));
+      remove.addEventListener("click", () => {
+        blockedTimes = blockedTimes.filter((b) => b !== block);
+        renderBlocks();
+        setStatus(document.getElementById("blockStatus"), "Removed. Select Save hours to apply.", "");
+      });
+      item.append(text, remove);
+      list.appendChild(item);
+    });
+  }
+
+  document.getElementById("addBlock").addEventListener("click", () => {
+    const status = document.getElementById("blockStatus");
+    const date = document.getElementById("blockDate").value;
+    const from = document.getElementById("blockFrom").value;
+    const to = document.getElementById("blockTo").value;
+    const note = document.getElementById("blockNote").value.trim();
+    if (!date || !from || !to) {
+      setStatus(status, "Choose a date, a start time, and an end time.", "err");
+      return;
+    }
+    if (from >= to) {
+      setStatus(status, "The end time needs to be after the start time.", "err");
+      return;
+    }
+    if (blockedTimes.some((b) => b.date === date && b.from === from && b.to === to)) {
+      setStatus(status, "That block is already in the list.", "err");
+      return;
+    }
+    blockedTimes.push({ date, from, to, note });
+    blockedTimes.sort((a, b) => (a.date + a.from).localeCompare(b.date + b.from));
+    renderBlocks();
+    document.getElementById("blockNote").value = "";
+    setStatus(status, "Added. Select Save hours to apply it to the booking form.", "ok");
+  });
 
   function syncHoursRow(row) {
     const closed = row.querySelector(".day-closed").checked;
@@ -800,6 +893,9 @@
     const data = await api("/api/admin/hours");
     document.getElementById("slotMinutes").value = String(data.slotMinutes || 15);
     closedDates = data.closedDates || [];
+    const today = todayIso();
+    blockedTimes = (data.blockedTimes || []).filter((block) => block.date >= today);
+    renderBlocks();
     const box = document.getElementById("hoursDays");
     box.replaceChildren();
     (data.hours || []).forEach((day) => {
@@ -828,7 +924,8 @@
       setStatus(status, "Saving…");
       await api("/api/admin/hours", { method: "POST", body: JSON.stringify(hoursPayload()) });
       await loadHours();
-      setStatus(status, "Hours saved. Closed days stay closed on the public booking calendar.", "ok");
+      setStatus(status, "Hours saved. Closed days and blocked times are now applied to the public booking form.", "ok");
+      setStatus(document.getElementById("blockStatus"), "");
     } catch (err) {
       setStatus(status, err.message, "err");
     }
