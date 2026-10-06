@@ -93,8 +93,8 @@ export default async (req: Request) => {
           'default',
           ${settings.timezone},
           ${settings.slotMinutes},
-          ${settings.hours}::jsonb,
-          ${settings.closedDates}::jsonb,
+          ${JSON.stringify(settings.hours)}::text::jsonb,
+          ${JSON.stringify(settings.closedDates)}::text::jsonb,
           ${JSON.stringify(settings.blockedTimes)}::text::jsonb,
           now()
         )
