@@ -81,7 +81,43 @@
   .closed-list { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
   .chip { border: 1px solid var(--border); padding: .35rem .6rem; display: flex; gap: .5rem; align-items: center; }
   .chip button { background: none; border: 0; color: var(--err); cursor: pointer; }
-  .block-row { display: grid; grid-template-columns: 9.5rem 8rem 8rem 1fr auto; gap: .75rem; align-items: end; }
+  input, select { color-scheme: dark; }
+  .block-row { display: grid; grid-template-columns: 12rem 8.5rem 8.5rem 1fr auto; gap: .75rem; align-items: end; }
+  .block-hint { margin-top: .6rem; color: var(--gold); font-family: var(--serif); min-height: 1.3em; }
+  .pop-wrap { position: relative; }
+  .pick-btn {
+    width: 100%; text-align: left; background: #0f0d0c; border: 1px solid var(--border);
+    color: var(--cream); padding: .75rem .85rem; cursor: pointer; display: flex; justify-content: space-between; gap: .5rem;
+  }
+  .pick-btn::after { content: "\25BE"; color: var(--gold); }
+  .pick-btn.empty { color: var(--muted); }
+  .pick-btn:focus-visible, .pop-day:focus-visible, .pop-nav:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .pop-cal {
+    position: absolute; z-index: 30; top: 100%; left: 0; margin-top: .35rem;
+    width: min(19.5rem, 86vw); background: var(--panel); border: 1px solid rgba(201,169,110,.55);
+    padding: .9rem; box-shadow: 0 14px 34px rgba(0,0,0,.6);
+  }
+  .pop-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .6rem; }
+  .pop-title { font-family: var(--serif); font-size: 1.15rem; }
+  .pop-nav { background: transparent; color: var(--gold); border: 1px solid var(--border); width: 2.1rem; height: 2.1rem; cursor: pointer; }
+  .pop-nav:disabled { opacity: .3; cursor: default; }
+  .pop-dow, .pop-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .25rem; }
+  .pop-dow span { text-align: center; color: var(--gold); font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; padding-bottom: .3rem; }
+  .pop-day {
+    position: relative; background: #0f0d0c; border: 1px solid transparent; color: var(--cream);
+    padding: .5rem 0; text-align: center; cursor: pointer; font-family: var(--serif);
+  }
+  .pop-day:hover:not(:disabled) { border-color: var(--gold); }
+  .pop-day:disabled { opacity: .28; cursor: default; }
+  .pop-day.is-closed { text-decoration: line-through; }
+  .pop-day.today { border-color: var(--border); }
+  .pop-day.picked { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+  .pop-day.has-block::after {
+    content: ""; position: absolute; left: 50%; bottom: .18rem; width: 5px; height: 5px;
+    margin-left: -2.5px; border-radius: 50%; background: var(--gold);
+  }
+  .pop-day.picked.has-block::after { background: var(--bg); }
+  .pop-legend { margin-top: .6rem; color: var(--muted); font-size: .75rem; }
   .block-add .btn { white-space: nowrap; }
   .block-list { display: grid; gap: .5rem; margin: .75rem 0 1.25rem; }
   .block-item { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid var(--border); padding: .55rem .75rem; }
@@ -326,17 +362,19 @@
         <h3 class="brand" style="font-size:1.3rem;margin:1.5rem 0 .4rem">Blocked times</h3>
         <p class="sub" style="margin-bottom:.9rem">Block any date and time window, for example a Saturday from 5:00 pm to 7:00 pm. Times from the start up to, but not including, the end are removed from the booking form. Bookings already made stay in the Bookings list.</p>
         <div class="block-row">
-          <div>
-            <label for="blockDate">Date</label>
-            <input id="blockDate" type="date">
+          <div class="pop-wrap">
+            <label for="blockDateBtn">Date</label>
+            <input id="blockDate" type="hidden">
+            <button type="button" class="pick-btn" id="blockDateBtn" aria-haspopup="dialog" aria-expanded="false">Choose a date</button>
+            <div class="pop-cal" id="blockCal" role="dialog" aria-label="Choose a date" hidden></div>
           </div>
           <div>
             <label for="blockFrom">Blocked from</label>
-            <input id="blockFrom" type="time">
+            <select id="blockFrom"></select>
           </div>
           <div>
             <label for="blockTo">Blocked until</label>
-            <input id="blockTo" type="time">
+            <select id="blockTo"></select>
           </div>
           <div>
             <label for="blockNote">Note (optional)</label>
@@ -346,6 +384,7 @@
             <button class="btn btn-ghost" type="button" id="addBlock">Add block</button>
           </div>
         </div>
+        <p class="block-hint" id="blockDayHint"></p>
         <p class="status" id="blockStatus"></p>
         <div class="block-list" id="blockList"></div>
         <button class="btn" type="submit">Save hours</button>
@@ -818,6 +857,194 @@
     });
   }
 
+  const blockDateInput = document.getElementById("blockDate");
+  const blockDateBtn = document.getElementById("blockDateBtn");
+  const blockCal = document.getElementById("blockCal");
+  const blockFrom = document.getElementById("blockFrom");
+  const blockTo = document.getElementById("blockTo");
+  let popYear = 0;
+  let popMonth = 0;
+
+  function longDate(iso) {
+    return new Date(iso + "T12:00:00").toLocaleDateString("en-NZ", {
+      weekday: "short", day: "numeric", month: "short", year: "numeric"
+    });
+  }
+  function minutesOf(hhmm) {
+    const [h, m] = String(hhmm || "").split(":").map(Number);
+    return h * 60 + m;
+  }
+  function hhmmOf(minutes) {
+    return pad2(Math.floor(minutes / 60)) + ":" + pad2(minutes % 60);
+  }
+
+  // Opening hours for a date, read live from the Hours form so edits show before saving.
+  function dayHoursFor(iso) {
+    const wanted = hoursPayload();
+    if (wanted.closedDates.includes(iso)) return { closed: true };
+    if (!wanted.hours.length) return { closed: false, open: "08:00", lastSlot: "20:00" };
+    const weekday = new Date(iso + "T12:00:00").getDay();
+    const row = wanted.hours.find((h) => h.weekday === weekday);
+    if (!row || row.closed || !row.open || !row.lastSlot) return { closed: true };
+    return row;
+  }
+
+  function fillTimeSelect(select, minutesList, placeholder) {
+    const previous = select.value;
+    select.replaceChildren();
+    const first = document.createElement("option");
+    first.value = "";
+    first.textContent = placeholder;
+    select.appendChild(first);
+    minutesList.forEach((m) => {
+      const opt = document.createElement("option");
+      opt.value = hhmmOf(m);
+      opt.textContent = clockLabel(hhmmOf(m));
+      select.appendChild(opt);
+    });
+    select.value = [...select.options].some((o) => o.value === previous) ? previous : "";
+  }
+
+  function refreshBlockTimes() {
+    const iso = blockDateInput.value;
+    const step = Number(document.getElementById("slotMinutes").value) || 15;
+    const day = iso ? dayHoursFor(iso) : null;
+    let start = 7 * 60;
+    let end = 22 * 60;
+    let hint = "";
+    if (day && !day.closed) {
+      start = minutesOf(day.open);
+      end = minutesOf(day.lastSlot) + step;
+      hint = longDate(iso) + " · Open " + clockLabel(day.open) + " – last seating " + clockLabel(day.lastSlot);
+    } else if (day && day.closed) {
+      hint = longDate(iso) + " is a closed day, so there is nothing to block.";
+    }
+    const fromTimes = [];
+    const toTimes = [];
+    for (let t = start; t < end; t += step) fromTimes.push(t);
+    for (let t = start + step; t <= end; t += step) toTimes.push(t);
+    fillTimeSelect(blockFrom, fromTimes, "Start time");
+    fillTimeSelect(blockTo, toTimes, "End time");
+    document.getElementById("blockDayHint").textContent = hint;
+  }
+
+  function setBlockDate(iso) {
+    blockDateInput.value = iso || "";
+    blockDateBtn.textContent = iso ? longDate(iso) : "Choose a date";
+    blockDateBtn.classList.toggle("empty", !iso);
+    refreshBlockTimes();
+  }
+
+  function closeBlockCal() {
+    blockCal.hidden = true;
+    blockDateBtn.setAttribute("aria-expanded", "false");
+  }
+
+  function renderBlockCal() {
+    blockCal.replaceChildren();
+    const today = todayIso();
+    const picked = blockDateInput.value;
+    const blockedDays = new Set(blockedTimes.map((b) => b.date));
+
+    const head = document.createElement("div");
+    head.className = "pop-head";
+    const prev = document.createElement("button");
+    prev.type = "button";
+    prev.className = "pop-nav";
+    prev.textContent = "‹";
+    prev.setAttribute("aria-label", "Previous month");
+    prev.disabled = popYear * 12 + popMonth <= Number(today.slice(0, 4)) * 12 + Number(today.slice(5, 7)) - 1;
+    prev.addEventListener("click", () => { shiftPopMonth(-1); });
+    const title = document.createElement("span");
+    title.className = "pop-title";
+    title.textContent = new Date(popYear, popMonth, 1).toLocaleDateString("en-NZ", { month: "long", year: "numeric" });
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "pop-nav";
+    next.textContent = "›";
+    next.setAttribute("aria-label", "Next month");
+    next.addEventListener("click", () => { shiftPopMonth(1); });
+    head.append(prev, title, next);
+    blockCal.appendChild(head);
+
+    const dow = document.createElement("div");
+    dow.className = "pop-dow";
+    ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].forEach((d) => {
+      const span = document.createElement("span");
+      span.textContent = d;
+      dow.appendChild(span);
+    });
+    blockCal.appendChild(dow);
+
+    const grid = document.createElement("div");
+    grid.className = "pop-grid";
+    const firstDow = (new Date(popYear, popMonth, 1).getDay() + 6) % 7;
+    for (let i = 0; i < firstDow; i++) grid.appendChild(document.createElement("span"));
+    const days = new Date(popYear, popMonth + 1, 0).getDate();
+    for (let day = 1; day <= days; day++) {
+      const iso = popYear + "-" + pad2(popMonth + 1) + "-" + pad2(day);
+      const info = dayHoursFor(iso);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = String(day);
+      btn.className = "pop-day" +
+        (iso === today ? " today" : "") +
+        (iso === picked ? " picked" : "") +
+        (blockedDays.has(iso) ? " has-block" : "") +
+        (info.closed ? " is-closed" : "");
+      const past = iso < today;
+      btn.disabled = past || Boolean(info.closed);
+      btn.setAttribute("aria-label", longDate(iso) + (info.closed ? ", closed" : "") + (blockedDays.has(iso) ? ", has a block" : ""));
+      if (info.closed && !past) btn.title = "Closed";
+      btn.addEventListener("click", () => {
+        setBlockDate(iso);
+        closeBlockCal();
+        blockFrom.focus();
+      });
+      grid.appendChild(btn);
+    }
+    blockCal.appendChild(grid);
+
+    const legend = document.createElement("p");
+    legend.className = "pop-legend";
+    legend.textContent = "Struck-through days are closed. A dot marks days that already have a block.";
+    blockCal.appendChild(legend);
+  }
+
+  function shiftPopMonth(delta) {
+    const next = new Date(popYear, popMonth + delta, 1);
+    popYear = next.getFullYear();
+    popMonth = next.getMonth();
+    renderBlockCal();
+  }
+
+  blockDateBtn.addEventListener("click", () => {
+    if (!blockCal.hidden) {
+      closeBlockCal();
+      return;
+    }
+    const base = blockDateInput.value || todayIso();
+    popYear = Number(base.slice(0, 4));
+    popMonth = Number(base.slice(5, 7)) - 1;
+    renderBlockCal();
+    blockCal.hidden = false;
+    blockDateBtn.setAttribute("aria-expanded", "true");
+  });
+  document.addEventListener("click", (e) => {
+    if (!blockCal.hidden && !e.target.closest(".pop-wrap")) closeBlockCal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !blockCal.hidden) {
+      closeBlockCal();
+      blockDateBtn.focus();
+    }
+  });
+  blockFrom.addEventListener("change", () => {
+    if (blockFrom.value && blockTo.value && blockTo.value <= blockFrom.value) blockTo.value = "";
+  });
+  document.getElementById("slotMinutes").addEventListener("change", refreshBlockTimes);
+  document.getElementById("hoursDays").addEventListener("change", refreshBlockTimes);
+
   document.getElementById("addBlock").addEventListener("click", () => {
     const status = document.getElementById("blockStatus");
     const date = document.getElementById("blockDate").value;
@@ -905,6 +1132,7 @@
     });
     renderClosed();
     renderHoursSummary(data.hours || []);
+    refreshBlockTimes();
   }
 
   document.getElementById("addClosed").addEventListener("click", () => {
